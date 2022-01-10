@@ -37,6 +37,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             var fileName = string.Empty;
             var query = string.Empty;
             var connectionString = string.Empty;
+                var sql   = string.Empty;
 
             try
             {
@@ -50,7 +51,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
                     fileName = qd.FileName;
 
-                    var sql = GetSqlHelper.GetSql(sourceEngine.Database,
+                     sql = GetSqlHelper.GetSql(sourceEngine.Database,
                         qd.GetSql(vendor, sourceSchemaName),
                         sourceSchemaName);
 
@@ -78,14 +79,15 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             }
             catch (Exception e)
             {
-                var info = new StringBuilder();
+                throw new Exception($"QUERY: {sql}\n{e.Message}");
+                /*var info = new StringBuilder();
                 info.AppendLine("SourceEngine=" + sourceEngine);
                 info.AppendLine("SourceConnectionString=" + connectionString);
                 info.AppendLine("File name=" + fileName);
                 info.AppendLine("Query:");
                 info.AppendLine(query);
 
-                return new KeyValuePair<string, Exception>(info.ToString(), e);
+                return new KeyValuePair<string, Exception>(info.ToString(), e);*/
             }
 
 

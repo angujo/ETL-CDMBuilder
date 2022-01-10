@@ -40,6 +40,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
             var chunkId = 0;
             var k = 0;
+            var chunkRounds = Settings.Current.Building.ChunkRounds;
 
             using (var saver = Settings.Current.Building.SourceEngine.GetSaver()
                 .Create(Settings.Current.Building.SourceConnectionString,
@@ -53,6 +54,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                         new ChunkRecord { Id = chunkId, PersonId = Convert.ToInt64(c.Key), PersonSource = c.Value }));
 
                     chunkId++;
+                    if (chunkRounds > 0 && chunkRounds == chunkId) break;
                 }
 
                 if (chunks.Count > 0)

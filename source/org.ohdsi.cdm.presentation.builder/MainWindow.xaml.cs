@@ -10,23 +10,25 @@ namespace org.ohdsi.cdm.presentation.builder
     public partial class MainWindow : Window
     {
         private readonly BuilderViewModel _vm;
+
+        public static string _def_server = "localhost";
+
         public MainWindow()
         {
             InitializeComponent();
 
-            _vm = new BuilderViewModel();
-            DataContext = _vm;
+            DataContext = _vm = new BuilderViewModel();
 
-            ((PasswordBox)this.FindName("sourcePswd")).Password = _vm.SourcePswd;
-            ((PasswordBox)this.FindName("cdmPswd")).Password = _vm.CdmPswd;
-            ((PasswordBox)this.FindName("vocabPswd")).Password = _vm.VocabPswd;
+            ((PasswordBox) this.FindName("sourcePswd")).Password = _vm.SourcePswd;
+            ((PasswordBox) this.FindName("cdmPswd")).Password    = _vm.CdmPswd;
+            ((PasswordBox) this.FindName("vocabPswd")).Password  = _vm.VocabPswd;
 
 
             var s = new Style();
             s.Setters.Add(new Setter(VisibilityProperty, Visibility.Collapsed));
-            tabControl.ItemContainerStyle = s;
-            tabControl.SelectedIndex = 0;
-            tabControl.SelectionChanged += TabControl_SelectionChanged;
+            tabControl.ItemContainerStyle =  s;
+            tabControl.SelectedIndex      =  0;
+            tabControl.SelectionChanged   += TabControl_SelectionChanged;
 
             this.Closing += MainWindow_Closing;
         }
@@ -42,7 +44,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            var pswdBox = (PasswordBox)sender;
+            var pswdBox = (PasswordBox) sender;
 
             if (pswdBox.Name == "cdmPswd")
             {

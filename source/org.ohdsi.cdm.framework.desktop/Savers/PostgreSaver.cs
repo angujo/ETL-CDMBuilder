@@ -12,19 +12,22 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
     {
         private NpgsqlConnection _connection;
 
-        public override ISaver Create(string connectionString, CdmVersions cdmVersion, string sourceSchema, string destinationSchema)
+        public override ISaver Create(string connectionString, CdmVersions cdmVersion, string sourceSchema,
+            string destinationSchema)
         {
-            CdmVersion = cdmVersion;
-            SourceSchema = sourceSchema;
+            CdmVersion        = cdmVersion;
+            SourceSchema      = sourceSchema;
             DestinationSchema = destinationSchema;
 
             var odbc = new OdbcConnectionStringBuilder(connectionString);
 
-            var connectionStringTemplate = "Server={server};Port=5432;Database={database};User Id={username};Password={password};SslMode=Require;Trust Server Certificate=true";
+            var connectionStringTemplate =
+                "Server={server};Port=5432;Database={database};User Id={username};Password={password};Trust Server Certificate=true";
 
             var npgsqlConnectionString = connectionStringTemplate.Replace("{server}", odbc["server"].ToString())
-                .Replace("{database}", odbc["database"].ToString()).Replace("{username}", odbc["uid"].ToString())
-                .Replace("{password}", odbc["pwd"].ToString());
+                                                                 .Replace("{database}", odbc["database"].ToString())
+                                                                 .Replace("{username}", odbc["uid"].ToString())
+                                                                 .Replace("{password}", odbc["pwd"].ToString());
 
             Console.WriteLine("npgsqlConnectionString=" + npgsqlConnectionString);
             _connection = SqlConnectionHelper.OpenNpgsqlConnection(npgsqlConnectionString);
@@ -59,34 +62,44 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
 
             var q = $"COPY {tableName} ({string.Join(",", fields)}) from STDIN (FORMAT BINARY)";
 
-            using (var inStream = _connection.BeginBinaryImport(q))
+            try
             {
-                while (reader.Read())
+                using (var inStream = _connection.BeginBinaryImport(q))
                 {
-                    inStream.StartRow();
-
-                    for (var i = 0; i < reader.FieldCount; i++)
+                    while (reader.Read())
                     {
-                        var value = reader.GetValue(i);
+                        inStream.StartRow();
 
-                        if (value is null)
+                        for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            inStream.WriteNull();
-                        }
-                        else
-                        {
-                            var fd = GetFieldType(reader.GetFieldType(i), reader.GetName(i));
-                            inStream.Write(value, fd);
+                            var value = reader.GetValue(i);
+
+                            if (value is null)
+                            {
+                                inStream.WriteNull();
+                            }
+                            else
+                            {
+                                var fd = GetFieldType(reader.GetFieldType(i), reader.GetName(i));
+                                inStream.Write(value, fd);
+                            }
                         }
                     }
+
+                    inStream.Complete();
                 }
-                inStream.Complete();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw new Exception(q+"\n"+e.Message);
+                throw;
             }
         }
 
         private static NpgsqlDbType GetFieldType(Type type, string fieldName)
         {
-            var name = type.Name;
+            var name           = type.Name;
             var underlyingType = Nullable.GetUnderlyingType(type);
             if (underlyingType != null)
             {
@@ -102,23 +115,23 @@ namespace org.ohdsi.cdm.framework.desktop.Savers
                 case "Decimal":
                     return NpgsqlDbType.Numeric;
                 case "DateTime":
-                    {
-                        if (fieldName.ToLower().Contains("time"))
-                            return NpgsqlDbType.Timestamp;
+                {
+                    if (fieldName.ToLower().Contains("time"))
+                        return NpgsqlDbType.Timestamp;
 
-                        return NpgsqlDbType.Date;
-                    }
+                    return NpgsqlDbType.Date;
+                }
                 case "TimeSpan":
                     return NpgsqlDbType.Time;
                 case "String":
-                    {
-                        // workaround for 5.3 schema, string used for Timestamp
-                        if (fieldName.ToLower().Contains("time"))
-                            return NpgsqlDbType.Time;
+                {
+                    // workaround for 5.3 schema, string used for Timestamp
+                    if (fieldName.ToLower().Contains("time"))
+                        return NpgsqlDbType.Time;
 
 
-                        return NpgsqlDbType.Varchar;
-                    }
+                    return NpgsqlDbType.Varchar;
+                }
 
                 default:
                     throw new NotImplementedException();

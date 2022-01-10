@@ -86,6 +86,9 @@ namespace org.ohdsi.cdm.presentation.builder
         public int ChunkSize => int.Parse(ConfigurationManager.AppSettings["ChunkSize"]);
 
         [XmlIgnore]
+        public int ChunkRounds => int.Parse(ConfigurationManager.AppSettings["ChunkRounds"]);
+
+        [XmlIgnore]
         public string BatchScript { get; set; }
 
         [XmlIgnore]
@@ -231,6 +234,7 @@ namespace org.ohdsi.cdm.presentation.builder
                 fileName = $@"{folder}\Settings.xml";
             }
 
+          //  throw new Exception(fileName);
             if (File.Exists(fileName))
             {
                 var xmlSerializer = new XmlSerializer(GetType());

@@ -22,7 +22,6 @@ namespace org.ohdsi.cdm.framework.etl.cprd
         public override IEnumerable<VisitDetail> BuildVisitDetails(VisitDetail[] visitDetails,
             VisitOccurrence[] visitOccurrences, ObservationPeriod[] observationPeriods)
         {
-
             foreach (var visitOccurrence in visitOccurrences)
             {
                 var visitDetail =

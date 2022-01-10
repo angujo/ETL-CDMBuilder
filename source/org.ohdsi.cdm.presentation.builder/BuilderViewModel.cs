@@ -9,38 +9,36 @@ using System.Windows.Input;
 
 namespace org.ohdsi.cdm.presentation.builder
 {
-
     public class BuilderViewModel : INotifyPropertyChanged
     {
         #region Variables
 
+        private string _sourceServer = "localhost";
+        private string _sourceDb     = "cdm_gold_202107";
+        private string _sourceSchema = "source";
+        private string _sourceUser   = "cdm_user";
+        public  string SourcePswd { get; set; }
 
-        private string _sourceServer;
-        private string _sourceDb;
-        private string _sourceSchema;
-        private string _sourceUser;
-        public string SourcePswd { get; set; }
+        private string _cdmServer = "localhost";
+        private string _cdmDb     = "cdm_gold_202107";
+        private string _cdmSchema = "public";
+        private string _cdmUser   = "cdm_user";
+        public  string CdmPswd { get; set; }
 
-        private string _cdmServer;
-        private string _cdmDb;
-        private string _cdmSchema;
-        private string _cdmUser;
-        public string CdmPswd { get; set; }
-
-        private string _vocabServer;
-        private string _vocabDb;
-        private string _vocabSchema;
-        private string _vocabUser;
-        public string VocabPswd { get; set; }
+        private string _vocabServer = "localhost";
+        private string _vocabDb     = "cdm_gold_202107";
+        private string _vocabSchema = "public";
+        private string _vocabUser   = "cdm_user";
+        public  string VocabPswd { get; set; }
 
 
         private BuildingController _buildingController;
-        private bool _buttonEnabled;
-        private bool _settingUnlocked;
+        private bool               _buttonEnabled;
+        private bool               _settingUnlocked;
 
-        private readonly System.Timers.Timer _timer = new System.Timers.Timer { Interval = 1000 };
-        private readonly System.Timers.Timer _timerUi = new System.Timers.Timer { Interval = 1000 };
-        private int _errorsCount;
+        private readonly System.Timers.Timer _timer   = new System.Timers.Timer {Interval = 1000};
+        private readonly System.Timers.Timer _timerUi = new System.Timers.Timer {Interval = 1000};
+        private          int                 _errorsCount;
 
         #endregion
 
@@ -53,7 +51,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _sourceServer;
             set
             {
-                if (value != _sourceServer)
+                if (null != value && value != _sourceServer)
                 {
                     _sourceServer = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SourceServer"));
@@ -66,7 +64,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _sourceDb;
             set
             {
-                if (value != _sourceDb)
+                if (null != value && value != _sourceDb)
                 {
                     _sourceDb = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SourceDb"));
@@ -81,7 +79,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _sourceSchema;
             set
             {
-                if (value != _sourceSchema)
+                if (null != value && value != _sourceSchema)
                 {
                     _sourceSchema = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SourceSchema"));
@@ -94,7 +92,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _sourceUser;
             set
             {
-                if (value != _sourceUser)
+                if (null != value && value != _sourceUser)
                 {
                     _sourceUser = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SourceUser"));
@@ -107,7 +105,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _cdmServer;
             set
             {
-                if (value != _cdmServer)
+                if (null != value && value != _cdmServer)
                 {
                     _cdmServer = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmServer"));
@@ -120,13 +118,11 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _cdmDb;
             set
             {
-                if (value != _cdmDb)
-                {
-                    _cdmDb = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmDb"));
-                    UpdateSettings();
-                    Settings.Current.Load();
-                }
+                if (null == value || value == _cdmDb) return;
+                _cdmDb = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmDb"));
+                UpdateSettings();
+                Settings.Current.Load();
             }
         }
 
@@ -135,11 +131,9 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _cdmSchema;
             set
             {
-                if (value != _cdmSchema)
-                {
-                    _cdmSchema = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmSchema"));
-                }
+                if (null == value || value == _cdmSchema) return;
+                _cdmSchema = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmSchema"));
             }
         }
 
@@ -148,11 +142,9 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _cdmUser;
             set
             {
-                if (value != _cdmUser)
-                {
-                    _cdmUser = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmUser"));
-                }
+                if (null == value || value == _cdmUser) return;
+                _cdmUser = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CdmUser"));
             }
         }
 
@@ -161,11 +153,9 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _vocabServer;
             set
             {
-                if (value != _vocabServer)
-                {
-                    _vocabServer = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabServer"));
-                }
+                if (null == value || value == _vocabServer) return;
+                _vocabServer = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabServer"));
             }
         }
 
@@ -174,13 +164,11 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _vocabDb;
             set
             {
-                if (value != _vocabDb)
-                {
-                    _vocabDb = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabDb"));
-                    UpdateSettings();
-                    Settings.Current.Load();
-                }
+                if (null == value || value == _vocabDb) return;
+                _vocabDb = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabDb"));
+                UpdateSettings();
+                Settings.Current.Load();
             }
         }
 
@@ -189,7 +177,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _vocabSchema;
             set
             {
-                if (value != _vocabSchema)
+                if (null != value && value != _vocabSchema)
                 {
                     _vocabSchema = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabSchema"));
@@ -202,7 +190,7 @@ namespace org.ohdsi.cdm.presentation.builder
             get => _vocabUser;
             set
             {
-                if (value != _vocabUser)
+                if (null != value && value != _vocabUser)
                 {
                     _vocabUser = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VocabUser"));
@@ -245,7 +233,8 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool DestinationWorking => DestinationStarted && _buildingController.CurrentState == BuilderState.Running;
+        public bool DestinationWorking =>
+            DestinationStarted && _buildingController.CurrentState == BuilderState.Running;
 
         public bool DestinationCreated
         {
@@ -256,8 +245,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool DestinationSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CreateDestinationDbStart,
-                                              Settings.Current.Building.BuildingState.CreateDestinationDbEnd);
+        public bool DestinationSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.CreateDestinationDbStart,
+            Settings.Current.Building.BuildingState.CreateDestinationDbEnd);
 
         public string DestinationInfo
         {
@@ -296,8 +286,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool ChunksSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CreateChunksStart,
-                                         Settings.Current.Building.BuildingState.CreateChunksEnd);
+        public bool ChunksSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.CreateChunksStart,
+            Settings.Current.Building.BuildingState.CreateChunksEnd);
 
         public string ChunksInfo
         {
@@ -336,8 +327,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool LookupSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CreateLookupStart,
-                                         Settings.Current.Building.BuildingState.CreateLookupEnd);
+        public bool LookupSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.CreateLookupStart,
+            Settings.Current.Building.BuildingState.CreateLookupEnd);
 
         public string LookupInfo
         {
@@ -386,8 +378,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool BuildingSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.BuildingStart,
-                                           Settings.Current.Building.BuildingState.BuildingEnd);
+        public bool BuildingSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.BuildingStart,
+            Settings.Current.Building.BuildingState.BuildingEnd);
 
         public string BuildingInfo
         {
@@ -432,8 +425,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool IndexesSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CreateIndexesStart,
-                                          Settings.Current.Building.BuildingState.CreateIndexesEnd);
+        public bool IndexesSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.CreateIndexesStart,
+            Settings.Current.Building.BuildingState.CreateIndexesEnd);
 
         public string IndexesInfo
         {
@@ -472,8 +466,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool VocabularySkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.CopyVocabularyStart,
-                                             Settings.Current.Building.BuildingState.CopyVocabularyEnd);
+        public bool VocabularySkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.CopyVocabularyStart,
+            Settings.Current.Building.BuildingState.CopyVocabularyEnd);
 
         public string VocabularyInfo
         {
@@ -502,7 +497,8 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool PostprocessWorking => PostprocessStarted && _buildingController.CurrentState == BuilderState.Running;
+        public bool PostprocessWorking =>
+            PostprocessStarted && _buildingController.CurrentState == BuilderState.Running;
 
         public bool PostprocessFinished
         {
@@ -513,8 +509,9 @@ namespace org.ohdsi.cdm.presentation.builder
             }
         }
 
-        public bool PostprocessSkipped => _buildingController != null && IsSkipped(Settings.Current.Building.BuildingState.PostprocessStart,
-                                              Settings.Current.Building.BuildingState.PostprocessEnd);
+        public bool PostprocessSkipped => _buildingController != null && IsSkipped(
+            Settings.Current.Building.BuildingState.PostprocessStart,
+            Settings.Current.Building.BuildingState.PostprocessEnd);
 
         public string PostprocessInfo
         {
@@ -562,10 +559,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public string ErrorsInfo
         {
-            get
-            {
-                return string.Empty;
-            }
+            get { return string.Empty; }
         }
 
 
@@ -624,7 +618,6 @@ namespace org.ohdsi.cdm.presentation.builder
         public ICommand RestartChunksCreationStepCommand => new DelegateCommand(RestartChunksCreationStep);
 
 
-
         public ICommand SkipBuildingStepCommand => new DelegateCommand(SkipBuildingStep);
 
         public ICommand ResetBuildingStepCommand
@@ -666,7 +659,7 @@ namespace org.ohdsi.cdm.presentation.builder
             if (DestinationSkipped) return;
 
             if (MessageBox.Show("All data will be lost, do you want to continue?", "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetDbCreationStep();
                 ResetChunksCreationStep(false);
@@ -712,7 +705,7 @@ namespace org.ohdsi.cdm.presentation.builder
             const string message = "Chunk data will be lost, do you want to continue?";
             if (!showWarningDialog ||
                 MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetChunksCreationStep();
             }
@@ -748,7 +741,7 @@ namespace org.ohdsi.cdm.presentation.builder
                 "Following tables will be truncated: CARE_SITE, LOCATION, ORGANIZATION, PROVIDER, do you want to continue?";
             if (!showWarningDialog ||
                 MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetLookupCreationStep(!showWarningDialog);
             }
@@ -792,7 +785,7 @@ namespace org.ohdsi.cdm.presentation.builder
                           "COHORT" + Environment.NewLine +
                           "GetPregnancyEpisodes you want to continue?";
             if (MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.TruncateTables();
             }
@@ -820,7 +813,7 @@ namespace org.ohdsi.cdm.presentation.builder
                           "COHORT" + Environment.NewLine +
                           "Do you want to continue?";
             if (MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.TruncateWithoutLookupTables();
             }
@@ -835,7 +828,7 @@ namespace org.ohdsi.cdm.presentation.builder
             var message = "All built data will be lost, do you want to continue?";
             if (!showWarningDialog ||
                 MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetBuildingStep(!showWarningDialog);
             }
@@ -865,7 +858,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
             if (!showWarningDialog ||
                 MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetVocabularyStep(!showWarningDialog);
             }
@@ -910,7 +903,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
             if (!showWarningDialog ||
                 MessageBox.Show(message, "Warning", MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 _buildingController.ResetPostprocessStep();
             }
@@ -934,28 +927,28 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public BuilderViewModel()
         {
-            ButtonEnabled = true;
+            ButtonEnabled   = true;
             SettingUnlocked = true;
 
             Settings.Initialize();
 
             SourceServer = Settings.Current.Building.SourceServer;
-            SourceDb = Settings.Current.Building.SourceDb;
+            SourceDb     = Settings.Current.Building.SourceDb;
             SourceSchema = Settings.Current.Building.SourceSchema;
-            SourceUser = Settings.Current.Building.SourceUser;
-            SourcePswd = Settings.Current.Building.SourcePswd;
+            SourceUser   = Settings.Current.Building.SourceUser;
+            SourcePswd   = Settings.Current.Building.SourcePswd;
 
             CdmServer = Settings.Current.Building.CdmServer;
-            CdmDb = Settings.Current.Building.CdmDb;
+            CdmDb     = Settings.Current.Building.CdmDb;
             CdmSchema = Settings.Current.Building.CdmSchema;
-            CdmUser = Settings.Current.Building.CdmUser;
-            CdmPswd = Settings.Current.Building.CdmPswd;
+            CdmUser   = Settings.Current.Building.CdmUser;
+            CdmPswd   = Settings.Current.Building.CdmPswd;
 
             VocabServer = Settings.Current.Building.VocabServer;
-            VocabDb = Settings.Current.Building.VocabDb;
+            VocabDb     = Settings.Current.Building.VocabDb;
             VocabSchema = Settings.Current.Building.VocabSchema;
-            VocabUser = Settings.Current.Building.VocabUser;
-            VocabPswd = Settings.Current.Building.VocabPswd;
+            VocabUser   = Settings.Current.Building.VocabUser;
+            VocabPswd   = Settings.Current.Building.VocabPswd;
 
             _timer.Elapsed += OnTimer;
             _timer.Start();
@@ -1027,7 +1020,7 @@ namespace org.ohdsi.cdm.presentation.builder
         private void SetBuilding()
         {
             if (_buildingController != null && (_buildingController.CurrentState == BuilderState.Running ||
-                                               _buildingController.CurrentState == BuilderState.Stopping)) return;
+                                                _buildingController.CurrentState == BuilderState.Stopping)) return;
 
             _timer.Stop();
             UpdateSettings();
@@ -1083,22 +1076,22 @@ namespace org.ohdsi.cdm.presentation.builder
             //Settings.Settings.Current.Building.ChunkSize = 1000;
 
             Settings.Current.Building.SourceServer = SourceServer;
-            Settings.Current.Building.SourceDb = SourceDb;
+            Settings.Current.Building.SourceDb     = SourceDb;
             Settings.Current.Building.SourceSchema = SourceSchema;
-            Settings.Current.Building.SourceUser = SourceUser;
-            Settings.Current.Building.SourcePswd = SourcePswd;
+            Settings.Current.Building.SourceUser   = SourceUser;
+            Settings.Current.Building.SourcePswd   = SourcePswd;
 
             Settings.Current.Building.CdmServer = CdmServer;
-            Settings.Current.Building.CdmDb = CdmDb;
+            Settings.Current.Building.CdmDb     = CdmDb;
             Settings.Current.Building.CdmSchema = CdmSchema;
-            Settings.Current.Building.CdmUser = CdmUser;
-            Settings.Current.Building.CdmPswd = CdmPswd;
+            Settings.Current.Building.CdmUser   = CdmUser;
+            Settings.Current.Building.CdmPswd   = CdmPswd;
 
             Settings.Current.Building.VocabServer = VocabServer;
-            Settings.Current.Building.VocabDb = VocabDb;
+            Settings.Current.Building.VocabDb     = VocabDb;
             Settings.Current.Building.VocabSchema = VocabSchema;
-            Settings.Current.Building.VocabUser = VocabUser;
-            Settings.Current.Building.VocabPswd = VocabPswd;
+            Settings.Current.Building.VocabUser   = VocabUser;
+            Settings.Current.Building.VocabPswd   = VocabPswd;
         }
 
 

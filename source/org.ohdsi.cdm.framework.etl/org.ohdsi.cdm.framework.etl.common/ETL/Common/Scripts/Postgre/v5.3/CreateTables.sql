@@ -1,4 +1,4 @@
-CREATE TABLE {sc}.attribute_definition
+CREATE TABLE IF NOT EXISTS {sc}.attribute_definition
 (
    attribute_definition_id    integer        NOT NULL,
    attribute_name             varchar(255)   NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE {sc}.attribute_definition
    attribute_syntax           text
 );
 
-CREATE TABLE {sc}.care_site
+CREATE TABLE IF NOT EXISTS {sc}.care_site
 (
    care_site_id                   bigint         NOT NULL,
    care_site_name                 varchar(255),
@@ -17,13 +17,13 @@ CREATE TABLE {sc}.care_site
    place_of_service_source_value  varchar(50)
 );
 
-CREATE TABLE {sc}.cdm_domain_meta
+CREATE TABLE IF NOT EXISTS {sc}.cdm_domain_meta
 (
    domain_id    varchar(20),
    description  varchar(4000)
 );
 
-CREATE TABLE {sc}.cdm_source
+CREATE TABLE IF NOT EXISTS {sc}.cdm_source
 (
    cdm_source_name                 varchar(255)   NOT NULL,
    cdm_source_abbreviation         varchar(25),
@@ -37,7 +37,7 @@ CREATE TABLE {sc}.cdm_source
    vocabulary_version              varchar(20)
 );
 
-CREATE TABLE {sc}.cohort
+CREATE TABLE IF NOT EXISTS {sc}.cohort
 (
    cohort_definition_id  integer   NOT NULL,
    subject_id            integer   NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE {sc}.cohort
    cohort_end_date       date      NOT NULL
 );
 
-CREATE TABLE {sc}.cohort_attribute
+CREATE TABLE IF NOT EXISTS {sc}.cohort_attribute
 (
    cohort_definition_id     integer   NOT NULL,
    subject_id               integer   NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE {sc}.cohort_attribute
    value_as_concept_id      integer
 );
 
-CREATE TABLE {sc}.cohort_definition
+CREATE TABLE IF NOT EXISTS {sc}.cohort_definition
 (
    cohort_definition_id           integer        NOT NULL,
    cohort_definition_name         varchar(255)   NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE {sc}.cohort_definition
    cohort_initiation_date         date
 );
 
-CREATE TABLE {sc}.concept
+CREATE TABLE IF NOT EXISTS {sc}.concept
 (
    concept_id        integer        NOT NULL,
    concept_name      varchar(255)   NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE {sc}.concept
    invalid_reason    varchar(1)
 );
 
-CREATE TABLE {sc}.concept_ancestor
+CREATE TABLE IF NOT EXISTS {sc}.concept_ancestor
 (
    ancestor_concept_id       integer   NOT NULL,
    descendant_concept_id     integer   NOT NULL,
@@ -89,14 +89,14 @@ CREATE TABLE {sc}.concept_ancestor
    max_levels_of_separation  integer   NOT NULL
 );
 
-CREATE TABLE {sc}.concept_class
+CREATE TABLE IF NOT EXISTS {sc}.concept_class
 (
    concept_class_id          varchar(20)    NOT NULL,
    concept_class_name        varchar(255)   NOT NULL,
    concept_class_concept_id  integer        NOT NULL
 );
 
-CREATE TABLE {sc}.concept_relationship
+CREATE TABLE IF NOT EXISTS {sc}.concept_relationship
 (
    concept_id_1      integer       NOT NULL,
    concept_id_2      integer       NOT NULL,
@@ -106,14 +106,14 @@ CREATE TABLE {sc}.concept_relationship
    invalid_reason    varchar(1)
 );
 
-CREATE TABLE {sc}.concept_synonym
+CREATE TABLE IF NOT EXISTS {sc}.concept_synonym
 (
    concept_id            integer         NOT NULL,
    concept_synonym_name  varchar(1000)   NOT NULL,
    language_concept_id   integer         NOT NULL
 );
 
-CREATE TABLE {sc}.condition_era
+CREATE TABLE IF NOT EXISTS {sc}.condition_era
 (
    condition_era_id            bigint    NOT NULL,
    person_id                   bigint    NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE {sc}.condition_era
    condition_occurrence_count  integer
 );
 
-CREATE TABLE {sc}.condition_occurrence
+CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
 (
    condition_occurrence_id        bigint        NOT NULL,
    person_id                      bigint        NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE {sc}.condition_occurrence
   
 );
 
-CREATE TABLE {sc}.cost
+CREATE TABLE IF NOT EXISTS {sc}.cost
 (
    cost_id                    bigint        NOT NULL,
    cost_event_id              bigint        NOT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE {sc}.cost
    drg_source_value           varchar(3)
 );
 
-CREATE TABLE {sc}.death
+CREATE TABLE IF NOT EXISTS {sc}.death
 (
    person_id                bigint        NOT NULL,
    death_date               date          NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE {sc}.death
    cause_source_concept_id  integer
 );
 
-CREATE TABLE {sc}.device_exposure
+CREATE TABLE IF NOT EXISTS {sc}.device_exposure
 (
    device_exposure_id              bigint         NOT NULL,
    person_id                       bigint         NOT NULL,
@@ -200,14 +200,14 @@ CREATE TABLE {sc}.device_exposure
    device_source_concept_id        integer
 );
 
-CREATE TABLE {sc}.domain
+CREATE TABLE IF NOT EXISTS {sc}.domain
 (
    domain_id          varchar(20)    NOT NULL,
    domain_name        varchar(255)   NOT NULL,
    domain_concept_id  integer        NOT NULL
 );
 
-CREATE TABLE {sc}.dose_era
+CREATE TABLE IF NOT EXISTS {sc}.dose_era
 (
    dose_era_id          bigint    NOT NULL,
    person_id            integer   NOT NULL,
@@ -218,7 +218,7 @@ CREATE TABLE {sc}.dose_era
    dose_era_end_date    date      NOT NULL
 );
 
-CREATE TABLE {sc}.drug_era
+CREATE TABLE IF NOT EXISTS {sc}.drug_era
 (
    drug_era_id          bigint    NOT NULL,
    person_id            bigint    NOT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE {sc}.drug_era
    gap_days             integer
 );
 
-CREATE TABLE {sc}.drug_exposure
+CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
 (
    drug_exposure_id              bigint        NOT NULL,
    person_id                     bigint        NOT NULL,
@@ -256,7 +256,7 @@ CREATE TABLE {sc}.drug_exposure
    dose_unit_source_value        varchar(50)
 );
 
-CREATE TABLE {sc}.drug_strength
+CREATE TABLE IF NOT EXISTS {sc}.drug_strength
 (
    drug_concept_id              integer      NOT NULL,
    ingredient_concept_id        integer      NOT NULL,
@@ -272,7 +272,7 @@ CREATE TABLE {sc}.drug_strength
    invalid_reason               varchar(1)
 );
 
-CREATE TABLE {sc}.fact_relationship
+CREATE TABLE IF NOT EXISTS {sc}.fact_relationship
 (
    domain_concept_id_1      integer   NOT NULL,
    fact_id_1                integer   NOT NULL,
@@ -281,7 +281,7 @@ CREATE TABLE {sc}.fact_relationship
    relationship_concept_id  integer   NOT NULL
 );
 
-CREATE TABLE {sc}.location
+CREATE TABLE IF NOT EXISTS {sc}.location
 (
    location_id            bigint        NOT NULL,
    address_1              varchar(50),
@@ -293,7 +293,7 @@ CREATE TABLE {sc}.location
    location_source_value  varchar(50)
 );
 
-CREATE TABLE {sc}.measurement
+CREATE TABLE IF NOT EXISTS {sc}.measurement
 (
    measurement_id                 bigint          NOT NULL,
    person_id                      bigint          NOT NULL,
@@ -317,7 +317,7 @@ CREATE TABLE {sc}.measurement
    value_source_value             varchar(2500)
 );
 
-CREATE TABLE {sc}.metadata
+CREATE TABLE IF NOT EXISTS {sc}.metadata
 (
    metadata_concept_id       integer        NOT NULL,
    metadata_type_concept_id  integer        NOT NULL,
@@ -328,13 +328,13 @@ CREATE TABLE {sc}.metadata
    metadata_datetime         timestamp
 );
 
-CREATE TABLE {sc}.metadata_tmp
+CREATE TABLE IF NOT EXISTS {sc}.metadata_tmp
 (
    person_id  bigint         NOT NULL,
    name       varchar(250)   NOT NULL
 );
 
-CREATE TABLE {sc}.note
+CREATE TABLE IF NOT EXISTS {sc}.note
 (
    note_id                bigint         NOT NULL,
    person_id              integer        NOT NULL,
@@ -352,7 +352,7 @@ CREATE TABLE {sc}.note
    note_source_value      varchar(50)
 );
 
-CREATE TABLE {sc}.note_nlp
+CREATE TABLE IF NOT EXISTS {sc}.note_nlp
 (
    note_nlp_id                 bigint          NOT NULL,
    note_id                     integer         NOT NULL,
@@ -370,7 +370,7 @@ CREATE TABLE {sc}.note_nlp
    term_modifiers              varchar(2000)
 );
 
-CREATE TABLE {sc}.observation
+CREATE TABLE IF NOT EXISTS {sc}.observation
 (
    observation_id                 bigint          NOT NULL,
    person_id                      bigint          NOT NULL,
@@ -392,7 +392,7 @@ CREATE TABLE {sc}.observation
    qualifier_source_value         varchar(250)
 );
 
-CREATE TABLE {sc}.observation_period
+CREATE TABLE IF NOT EXISTS {sc}.observation_period
 (
    observation_period_id          bigint    NOT NULL,
    person_id                      bigint    NOT NULL,
@@ -401,7 +401,7 @@ CREATE TABLE {sc}.observation_period
    period_type_concept_id         integer   NOT NULL
 );
 
-CREATE TABLE {sc}.payer_plan_period
+CREATE TABLE IF NOT EXISTS {sc}.payer_plan_period
 (
    payer_plan_period_id           bigint        NOT NULL,
    person_id                      bigint        NOT NULL,
@@ -422,7 +422,7 @@ CREATE TABLE {sc}.payer_plan_period
    stop_reason_source_concept_id  integer
 );
 
-CREATE TABLE {sc}.person
+CREATE TABLE IF NOT EXISTS {sc}.person
 (
    person_id                    bigint        NOT NULL,
    gender_concept_id            integer       NOT NULL,
@@ -444,7 +444,7 @@ CREATE TABLE {sc}.person
    ethnicity_source_concept_id  integer
 );
 
-CREATE TABLE {sc}.procedure_occurrence
+CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
 (
    procedure_occurrence_id      bigint        NOT NULL,
    person_id                    bigint        NOT NULL,
@@ -462,14 +462,14 @@ CREATE TABLE {sc}.procedure_occurrence
    modifier_source_value        varchar(50)
 );
 
-CREATE TABLE {sc}.provider
+CREATE TABLE IF NOT EXISTS {sc}.provider
 (
    provider_id                  bigint         NOT NULL,
    provider_name                varchar(255),
    npi                          varchar(20),
    dea                          varchar(20),
    specialty_concept_id         integer,
-   care_site_id                 integer,
+   care_site_id                 bigint,
    year_of_birth                integer,
    gender_concept_id            integer,
    provider_source_value        varchar(50),
@@ -479,7 +479,7 @@ CREATE TABLE {sc}.provider
    gender_source_concept_id     integer
 );
 
-CREATE TABLE {sc}.relationship
+CREATE TABLE IF NOT EXISTS {sc}.relationship
 (
    relationship_id          varchar(20)    NOT NULL,
    relationship_name        varchar(255)   NOT NULL,
@@ -489,7 +489,7 @@ CREATE TABLE {sc}.relationship
    relationship_concept_id  integer        NOT NULL
 );
 
-CREATE TABLE {sc}.source_to_concept_map
+CREATE TABLE IF NOT EXISTS {sc}.source_to_concept_map
 (
    source_code              varchar(50)    NOT NULL,
    source_concept_id        integer        NOT NULL,
@@ -502,7 +502,7 @@ CREATE TABLE {sc}.source_to_concept_map
    invalid_reason           varchar(1)
 );
 
-CREATE TABLE {sc}.specimen
+CREATE TABLE IF NOT EXISTS {sc}.specimen
 (
    specimen_id                  bigint        NOT NULL,
    person_id                    bigint        NOT NULL,
@@ -521,7 +521,7 @@ CREATE TABLE {sc}.specimen
    disease_status_source_value  varchar(50)
 );
 
-CREATE TABLE {sc}.visit_detail
+CREATE TABLE IF NOT EXISTS {sc}.visit_detail
 (
    visit_detail_id                 bigint        NOT NULL,
    person_id                       bigint        NOT NULL,
@@ -544,7 +544,7 @@ CREATE TABLE {sc}.visit_detail
    visit_occurrence_id             bigint        NOT NULL
 );
 
-CREATE TABLE {sc}.visit_occurrence
+CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
 (
    visit_occurrence_id            bigint        NOT NULL,
    person_id                      bigint        NOT NULL,
@@ -565,7 +565,7 @@ CREATE TABLE {sc}.visit_occurrence
    preceding_visit_occurrence_id  bigint
 );
 
-CREATE TABLE {sc}.vocabulary
+CREATE TABLE IF NOT EXISTS {sc}.vocabulary
 (
    vocabulary_id          varchar(20)    NOT NULL,
    vocabulary_name        varchar(255)   NOT NULL,

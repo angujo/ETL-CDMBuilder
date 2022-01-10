@@ -1,1 +1,1 @@
-create database {0}
+create database if not exists {0}

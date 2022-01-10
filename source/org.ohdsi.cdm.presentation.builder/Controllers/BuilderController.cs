@@ -133,6 +133,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 vocabulary.Fill(true, false);
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
+                
                 var providerConcepts = new List<Provider>();
 
                 Console.WriteLine("Loading locations...");
@@ -203,6 +204,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 connection.Open();
                 using (var c = new OdbcCommand(sql, connection))
                 {
+                   // Logger.Write(null,LogMessageTypes.Info,"FillList Query: "+sql);
                     c.CommandTimeout = 30000;
                     using (var reader = c.ExecuteReader())
                     {

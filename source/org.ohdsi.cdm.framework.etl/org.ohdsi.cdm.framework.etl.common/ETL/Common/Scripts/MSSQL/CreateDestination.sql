@@ -1,4 +1,4 @@
-create database {0}
+create database IF NOT EXISTS {0}
 GO
 
 ALTER DATABASE {0} SET RECOVERY Simple

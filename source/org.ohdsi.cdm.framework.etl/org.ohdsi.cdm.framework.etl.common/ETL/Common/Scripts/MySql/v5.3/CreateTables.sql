@@ -427,7 +427,7 @@ CREATE TABLE {sc}.provider
    npi                          varchar(20),
    dea                          varchar(20),
    specialty_concept_id         int(11),
-   care_site_id                 int(11),
+   care_site_id                 bigint,
    year_of_birth                int(11),
    gender_concept_id            int(11),
    provider_source_value        varchar(50),

@@ -9,42 +9,54 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         private readonly string _connectionString;
         private readonly string _schemaName;
 
+        public bool IsMssql =>
+            _connectionString.ToLower().Contains("sql") && _connectionString.ToLower().Contains("server");
+
+        public bool IsMysql          => _connectionString.ToLower().Contains("mysql");
+        public bool IsPostgreSQL     => _connectionString.ToLower().Contains("postgresql");
+        public bool IsAmazonRedshift => _connectionString.ToLower().Contains("amazon redshift");
+
         public DbDestination(string connectionString, string schemaName)
         {
             _connectionString = connectionString;
-            _schemaName = schemaName;
+            _schemaName       = schemaName;
         }
 
         public void CreateDatabase(string query)
         {
             var sqlConnectionStringBuilder = new OdbcConnectionStringBuilder(_connectionString);
-            var database = sqlConnectionStringBuilder["database"];
+            var database                   = sqlConnectionStringBuilder["database"];
 
             // TMP
             var mySql = _connectionString.ToLower().Contains("mysql");
 
-            if (mySql)
+            if (IsMysql)
                 sqlConnectionStringBuilder["database"] = "mysql";
-            else if (_connectionString.ToLower().Contains("amazon redshift"))
+            else if (IsAmazonRedshift)
                 sqlConnectionStringBuilder["database"] = "poc";
             else
-                sqlConnectionStringBuilder["database"] = "master";
+                sqlConnectionStringBuilder["database"] = database;
+
+            // throw new Exception(_connectionString+" [QUERY] "+query);
 
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(sqlConnectionStringBuilder.ConnectionString))
             {
-                query = string.Format(query, database);
-
-                foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO" }, StringSplitOptions.None))
+                if (!DBExists(connection, (string) sqlConnectionStringBuilder["database"]))
                 {
-                    using (var command = new OdbcCommand(subQuery, connection))
+                    query = string.Format(query, database);
+
+                    foreach (var subQuery in query.Split(new[] {"\r\nGO", "\nGO"}, StringSplitOptions.None))
                     {
-                        command.CommandTimeout = 30000;
-                        command.ExecuteNonQuery();
+                        using (var command = new OdbcCommand(subQuery, connection))
+                        {
+                            command.CommandTimeout = 30000;
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
             }
 
-            if (!mySql && _schemaName.ToLower().Trim() != "dbo")
+            if (!IsMysql && _schemaName.ToLower().Trim() != "dbo")
             {
                 CreateSchema();
             }
@@ -54,7 +66,7 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
         {
             using (var connection = SqlConnectionHelper.OpenOdbcConnection(_connectionString))
             {
-                var query = $"create schema [{_schemaName}]";
+                var query = $"create schema IF NOT EXISTS {_schemaName}";
 
                 using (var command = new OdbcCommand(query, connection))
                 {
@@ -70,18 +82,36 @@ namespace org.ohdsi.cdm.framework.desktop.DbLayer
             {
                 query = query.Replace("{sc}", _schemaName);
 
-                foreach (var subQuery in query.Split(new[] { "\r\nGO", "\nGO", ";" }, StringSplitOptions.None))
+                foreach (var subQuery in query.Split(new[] {"\r\nGO", "\nGO", ";"}, StringSplitOptions.None))
                 {
                     if (string.IsNullOrEmpty(subQuery))
                         continue;
-
-                    using (var command = new OdbcCommand(subQuery, connection))
+                    try
                     {
-                        command.CommandTimeout = 30000;
-                        command.ExecuteNonQuery();
+                        using (var command = new OdbcCommand(subQuery, connection))
+                        {
+                            command.CommandTimeout = 30000;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(subQuery+"\n"+e.Message);
                     }
                 }
             }
+        }
+
+        private bool DBExists(OdbcConnection connection, string dbName)
+        {
+            if (IsPostgreSQL)
+            {
+                using var cmd = new OdbcCommand(
+                    $"SELECT 1 dbname FROM pg_catalog.pg_database WHERE datname = '{dbName}'", connection);
+                return null != cmd.ExecuteScalar();
+            }
+
+            return false;
         }
     }
 }
