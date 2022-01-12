@@ -1,0 +1,110 @@
+﻿<QueryDefinition>
+  <Query>
+    select a.patid,
+    a.eventdate,
+    a.staffid,
+    a.value_as_string,
+    a.value_as_number,
+    a.value_as_date,
+    a.unit_source_value,
+    right(cast(a.patid as varchar),5) as care_site_id,
+    a.constype,
+    (cast(a.patid as bigint) * 10000000000) +
+    (cast(date_part('year',a.eventdate) as bigint) * 1000000) +
+    (cast(date_part('month',a.eventdate) as bigint) * 10000) +
+    (cast(date_part('day',a.eventdate) as bigint) * 100) + coalesce(a.constype, 99) as visit_occurrence_id,
+    qualifier_source_value,
+    case
+    when a.qualifier_source_value = 'Not applicable' then 45882470
+    when a.qualifier_source_value = 'Abnormal' then 45878745
+    when a.qualifier_source_value = 'Absent' then 45884086
+    when a.qualifier_source_value = 'High' then 45876384
+    when a.qualifier_source_value = 'Low' then 45881666
+    when a.qualifier_source_value = 'Negative' then 45878583
+    when a.qualifier_source_value = 'Normal' then 45884153
+    when a.qualifier_source_value = 'Positive' then 45884084
+    when a.qualifier_source_value = 'Present' then 45879438
+    when a.qualifier_source_value = 'Trace' then 45881796
+    when a.qualifier_source_value = 'Unknown' then 45877986
+    when a.qualifier_source_value = 'Very high' then 45879181
+    when a.qualifier_source_value = 'Very low' then 45879182
+    end as qualifier_concept_id,
+    data,
+    concat(concat(concat(concat(concat(concat(cast(enttype as varchar), '-'), category), '-'), description), '-') , data)  as source_value
+    from
+    (
+    select a.patid,
+    c.eventdate,
+    con.constype,
+    c.consid,
+    c.staffid,
+    a.enttype,
+    e.category,
+    e.description,
+    sm.scoringmethod as data,
+    a.data1 as value_as_number,
+    '' as value_as_string,
+    case when e.data1_lkup = 'dd/mm/yyyy' then a.data1
+    end as value_as_date,
+    '' as unit_source_value,
+    lu4.text as qualifier_source_value,
+    '' as read_code_description,
+    '' as gemscript_description,
+    e.data_fields
+    from {sc}._chunks ch
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (372) --This enttype is for the results of scores and questionnaires
+    join {sc}.entity e on a.enttype = e.enttype
+    left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
+    left join {sc}.scoringmethod sm on a.data3 = sm.code::text
+    left join {sc}.lookuptype lt4 on e.data4_lkup = lt4.name
+    left join {sc}.lookup lu4 on lt4.lookup_type_id = lu4.lookup_type_id and lu4.code::text =  a.data4
+    left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
+    where ch.ChunkId = {0}
+    group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, sm.scoringmethod,
+     a.data1, lu4.text, e.data4_lkup, a.data1, e.data1_lkup
+    ) as a
+    where a.eventdate is not NULL order by a.patid
+  </Query>
+  <Observation>
+    <ObservationDefinition>
+      <PersonId>patid</PersonId>
+      <StartDate>eventdate</StartDate>
+      <ProviderId>staffid</ProviderId>
+      <VisitDetailId>visit_occurrence_id</VisitDetailId>
+      <QualifierConceptId>qualifier_concept_id</QualifierConceptId>
+      <QualifierSourceValue>qualifier_source_value</QualifierSourceValue>
+      <ValuesAsString>
+        <string>value_as_string</string>
+      </ValuesAsString>
+      <ValuesAsNumber>
+           <string>value_as_number</string>
+         </ValuesAsNumber>
+      <AdditionalFields>
+        <string>data</string>
+        <string>constype</string>
+      </AdditionalFields>
+      <Concepts>
+        <Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>Additional</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="source_value" defaultTypeId="38000280" isNullable="true"/>
+          </Fields>
+        </Concept>
+        <Concept>
+          <ConceptIdMappers>
+            <Mapper>
+              <Lookup>Units</Lookup>
+            </Mapper>
+          </ConceptIdMappers>
+          <Fields>
+            <Field key="unit_source_value" defaultTypeId="0" />
+          </Fields>
+        </Concept>
+      </Concepts>
+    </ObservationDefinition>
+  </Observation>
+</QueryDefinition>

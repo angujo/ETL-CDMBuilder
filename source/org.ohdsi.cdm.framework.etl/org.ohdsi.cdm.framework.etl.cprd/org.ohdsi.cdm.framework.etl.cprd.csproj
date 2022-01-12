@@ -8,7 +8,17 @@
     <None Remove="Batch.sql" />
     <None Remove="CdmSource.sql" />
     <None Remove="CohortDefinition.sql" />
-    <None Remove="ETL\CPRD\Definitions\Additional.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional1.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional2.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional3.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional4.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional5.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional6.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional7.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional8.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional9.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional10.xml" />
+    <None Remove="ETL\CPRD\Definitions\Additional11.xml" />
     <None Remove="ETL\CPRD\Definitions\Clinical.xml" />
     <None Remove="ETL\CPRD\Definitions\Immunisation.xml" />
     <None Remove="ETL\CPRD\Definitions\L_CARE_SITE.xml" />
@@ -37,7 +47,40 @@
     <Content Include="ETL\CPRD\CohortDefinition.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ETL\CPRD\Definitions\Additional.xml">
+    <Content Include="ETL\CPRD\Definitions\Additional1.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional11.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional3.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional4.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional5.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional6.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional7.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional8.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional9.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional10.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ETL\CPRD\Definitions\Additional11.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ETL\CPRD\Definitions\Clinical.xml">

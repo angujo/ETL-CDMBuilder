@@ -89,6 +89,9 @@ namespace org.ohdsi.cdm.presentation.builder
         public int ChunkRounds => int.Parse(ConfigurationManager.AppSettings["ChunkRounds"]);
 
         [XmlIgnore]
+        public string LogFilePath => (string)(ConfigurationManager.AppSettings["LogFile"]);
+        
+        [XmlIgnore]
         public string BatchScript { get; set; }
 
         [XmlIgnore]

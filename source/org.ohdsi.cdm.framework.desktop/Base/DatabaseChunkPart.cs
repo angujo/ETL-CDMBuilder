@@ -16,9 +16,10 @@ namespace org.ohdsi.cdm.framework.desktop.Base
     {
         public ChunkData ChunkData { get; private set; }
 
+        public Action<string> FileLog;
 
-
-        public DatabaseChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt) : base(chunkId, createPersonBuilder, prefix, attempt)
+        public DatabaseChunkPart(int chunkId, Func<IPersonBuilder> createPersonBuilder, string prefix, int attempt) :
+            base(chunkId, createPersonBuilder, prefix, attempt)
         {
             ChunkData = new ChunkData(ChunkId, int.Parse(Prefix));
             PersonBuilders = new Dictionary<long, Lazy<IPersonBuilder>>();
@@ -32,12 +33,12 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             OffsetManager = new KeyMasterOffsetManager(ChunkId, int.Parse(Prefix), 0);
         }
 
-        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName, List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
+        public KeyValuePair<string, Exception> Load(IDatabaseEngine sourceEngine, string sourceSchemaName,
+            List<QueryDefinition> sourceQueryDefinitions, OdbcConnection sourceConnection, string vendor)
         {
             var fileName = string.Empty;
-            var query = string.Empty;
             var connectionString = string.Empty;
-                var sql   = string.Empty;
+            var sql = string.Empty;
 
             try
             {
@@ -50,11 +51,14 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                     if (qd.CareSites != null) continue;
 
                     fileName = qd.FileName;
+                    LogToFile($"Starting log for file [{fileName}]...");
 
-                     sql = GetSqlHelper.GetSql(sourceEngine.Database,
+                    sql = GetSqlHelper.GetSql(sourceEngine.Database,
                         qd.GetSql(vendor, sourceSchemaName),
                         sourceSchemaName);
-
+                    
+                    LogToFile($"QUERY: {sql}");
+                    
                     if (string.IsNullOrEmpty(sql))
                         continue;
 
@@ -64,8 +68,8 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                     {
                         cdm.CommandTimeout = 30000;
                         using (var reader =
-                            sourceEngine.ReadChunkData(sourceConnection, cdm, qd, ChunkId,
-                                Prefix))
+                               sourceEngine.ReadChunkData(sourceConnection, cdm, qd, ChunkId,
+                                   Prefix))
                         {
                             while (reader.Read())
                             {
@@ -73,28 +77,28 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                             }
                         }
                     }
+                    
+                    LogToFile($"Ending log for file [{fileName}]");
                 }
 
                 timer.Stop();
             }
             catch (Exception e)
             {
-                throw new Exception($"QUERY: {sql}\n{e.Message}");
-                /*var info = new StringBuilder();
+                /*throw new Exception($"QUERY: {sql}\n{e.Message}");*/
+                var info = new StringBuilder();
                 info.AppendLine("SourceEngine=" + sourceEngine);
                 info.AppendLine("SourceConnectionString=" + connectionString);
                 info.AppendLine("File name=" + fileName);
                 info.AppendLine("Query:");
-                info.AppendLine(query);
+                info.AppendLine(sql);
 
-                return new KeyValuePair<string, Exception>(info.ToString(), e);*/
+                return new KeyValuePair<string, Exception>(info.ToString(), e);
             }
 
 
             return new KeyValuePair<string, Exception>(null, null);
         }
-
-
 
 
         public void Build()
@@ -112,7 +116,8 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             Console.WriteLine($"Building CDM chunkId={ChunkId} - complete");
         }
 
-        public void Save(CdmVersions cdm, string destinationConnectionString, IDatabaseEngine destinationEngine, string sourceSchema, string destinationSchema)
+        public void Save(CdmVersions cdm, string destinationConnectionString, IDatabaseEngine destinationEngine,
+            string sourceSchema, string destinationSchema)
         {
             Console.WriteLine($"Saving chunkId={ChunkId} ...");
             Console.WriteLine("DestinationConnectionString=" + destinationConnectionString);
@@ -129,8 +134,10 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             timer.Start();
             using (saver)
             {
-                saver.Create(destinationConnectionString, cdm, sourceSchema, destinationSchema).Save(ChunkData, OffsetManager);
+                saver.Create(destinationConnectionString, cdm, sourceSchema, destinationSchema)
+                    .Save(ChunkData, OffsetManager);
             }
+
             timer.Stop();
 
             Console.WriteLine($"Saving chunkId={ChunkId} - complete");
@@ -143,6 +150,16 @@ namespace org.ohdsi.cdm.framework.desktop.Base
         {
             ChunkData.Clean();
             ChunkData = null;
+        }
+
+        private void LogToFile(string cnt)
+        {
+            if (null == FileLog)
+            {
+                return;
+            }
+
+            FileLog(cnt);
         }
     }
 }

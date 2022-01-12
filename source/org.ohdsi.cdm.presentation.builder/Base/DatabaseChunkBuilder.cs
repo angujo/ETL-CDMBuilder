@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Diagnostics;
+using org.ohdsi.cdm.framework.desktop.Helpers;
 
 namespace org.ohdsi.cdm.presentation.builder.Base
 {
@@ -35,13 +36,14 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 Console.WriteLine("DatabaseChunkBuilder");
 
                 var part = new DatabaseChunkPart(_chunkId, _createPersonBuilder, "0", 0);
+                part.FileLog = (string c) => FileLogger.WriteLog(c);
 
                 var timer = new Stopwatch();
                 timer.Start();
-
+                
+                FileLogger.WriteLog("Query Loader Start");
 
                 var result = part.Load(sourceEngine, sourceSchemaName, sourceQueryDefinitions, sourceConnection, vendor);
-
                 if (result.Value != null)
                 {
                     Logger.Write(_chunkId, LogMessageTypes.Info, result.Key);

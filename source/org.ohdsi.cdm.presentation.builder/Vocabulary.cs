@@ -114,6 +114,7 @@ namespace org.ohdsi.cdm.presentation.builder
                                     var timer = new Stopwatch();
                                     timer.Start();
 
+                                    FileLogger.WriteLog(conceptIdMapper.Lookup + " - Loading into RAM...");
 
                                     Logger.Write(null, LogMessageTypes.Info, conceptIdMapper.Lookup + " - Loading into RAM...");
 
@@ -131,6 +132,8 @@ namespace org.ohdsi.cdm.presentation.builder
 
                                         _lookups.Add(conceptIdMapper.Lookup, lookup);
                                     }
+                                    
+                                    FileLogger.WriteLog(conceptIdMapper.Lookup + " - Done");
 
                                     Console.WriteLine(conceptIdMapper.Lookup + " - Done");
                                     timer.Stop();
