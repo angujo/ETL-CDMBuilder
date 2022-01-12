@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS {sc}.attribute_definition
 (
-   attribute_definition_id    integer        NOT NULL,
+   attribute_definition_id    bigint        NOT NULL,
    attribute_name             varchar(255)   NOT NULL,
    attribute_description      text,
    attribute_type_concept_id  integer        NOT NULL,
@@ -571,5 +571,5 @@ CREATE TABLE IF NOT EXISTS {sc}.vocabulary
    vocabulary_name        varchar(255)   NOT NULL,
    vocabulary_reference   varchar(255)   NOT NULL,
    vocabulary_version     varchar(255)   NOT NULL,
-   vocabulary_concept_id  integer        NOT NULL
+   vocabulary_concept_id  bigint        NOT NULL
 );

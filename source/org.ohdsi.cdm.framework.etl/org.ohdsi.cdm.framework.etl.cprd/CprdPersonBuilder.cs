@@ -203,8 +203,7 @@ namespace org.ohdsi.cdm.framework.etl.cprd
                 r.Id = Offset.GetKeyOffset(r.PersonId).ConditionEraId;
                 ChunkData.ConditionEra.Add(r);
             }
-
-
+            
             return Attrition.None;
         }
 

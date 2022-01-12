@@ -33,9 +33,10 @@
     null as RACE_CONCEPT_ID,
     null as RACE_SOURCE_VALUE,
     accept
-    from {sc}.PATIENT a
-    JOIN {sc}._chunks ch ON ch.ChunkId = {0} AND a.patid = ch.PERSON_ID
+    from {sc}._chunks ch
+    JOIN {sc}.PATIENT a ON a.patid = ch.PERSON_ID
     join {sc}.practice b on a.pracid = b.pracid
+    WHERE ch.ChunkId = {0}
     ) as person
     order by patid
   </Query>

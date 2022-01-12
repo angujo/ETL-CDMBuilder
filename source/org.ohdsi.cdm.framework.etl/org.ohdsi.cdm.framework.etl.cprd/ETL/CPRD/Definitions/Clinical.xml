@@ -75,11 +75,11 @@
     when c.constype = 61 then 'Extended Hours'
     end as description,
     c.constype
-    FROM {sc}.Clinical a
-    JOIN {sc}._chunks ch ON ch.ChunkId = {0} AND a.patid = ch.PERSON_ID
+    FROM {sc}._chunks ch
+    JOIN {sc}.Clinical a ON a.eventdate is not NULL AND a.patid = ch.PERSON_ID
     LEFT JOIN {sc}.Medical m on (a.medcode = m.medcode)
     left join {sc}.consultation c on a.patid = c.patid and a.consid = c.consid
-    where a.eventdate is not NULL
+    where ch.ChunkId = {0}
     order by a.patid
   </Query>
   <ConditionOccurrence>

@@ -7,7 +7,7 @@
     a.value_as_number,
     a.value_as_date,
     a.unit_source_value,
-    right(cast(a.patid as varchar),3) as care_site_id,
+    right(cast(a.patid as varchar),5) as care_site_id,
     a.constype,
     (cast(a.patid as bigint) * 10000000000) +
     (cast(date_part('year',a.eventdate) as bigint) * 1000000) +
@@ -62,15 +62,15 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch 
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (72,116,372,78) --These are enttypes where data1 is the value and data2 is the unit
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 0
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data1_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data1
     left join {sc}.medical m on m.medcode::text = a.data1 and e.data1_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text = a.data1 and e.data1_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND e.data_fields &gt; 0 and a.enttype not in (72,116,372,78) --These are enttypes where data1 is the value and data2 is the unit
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data1,
      a.data1, lu.text, e.data1_lkup, m.read_code, m.desc, a.data1,
     p.productname, p.gemscriptcode
@@ -105,15 +105,15 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (72,116,78,60,119,120)
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 1
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data2_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data2
     left join {sc}.medical m on m.medcode::text =  a.data2 and e.data2_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data2  and e.data2_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND e.data_fields &gt; 1 and a.enttype not in (72,116,78,60,119,120)
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data2,
      a.data2, lu.text, e.data2_lkup, m.read_code, m.desc, a.data2,
     p.productname, p.gemscriptcode
@@ -144,15 +144,15 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 2
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data3_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data3
     left join {sc}.medical m on m.medcode::text =  a.data3 and e.data3_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data3 and e.data3_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid 
-    where ch.ChunkId = {0} AND e.data_fields &gt; 2 and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data3,
      a.data3, lu.text, e.data3_lkup, m.read_code, m.desc, a.data3,
     p.productname, p.gemscriptcode
@@ -183,19 +183,17 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 3
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data4_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data4
     left join {sc}.medical m on m.medcode::text =  a.data4 and e.data4_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data4 and e.data4_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid   
-    where ch.ChunkId = {0} AND e.data_fields &gt; 3 and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
-
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data4,
-     a.data4, lu.text, e.data4_lkup, m.read_code, m.desc, a.data4,
-    p.productname, p.gemscriptcode
+     a.data4, lu.text, e.data4_lkup, m.read_code, m.desc, a.data4, p.productname, p.gemscriptcode
 
     UNION
 
@@ -223,19 +221,17 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (78) --For this enttype data5 and data6 are coupled and handled farther down in the query
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
-    join {sc}.entity e on a.enttype = e.enttype
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 4
     left join {sc}.lookuptype lt on e.data5_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data5
     left join {sc}.medical m on m.medcode::text =  a.data5 and e.data5_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data5 and e.data5_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid  
-    where ch.ChunkId = {0} AND e.data_fields &gt; 4 and a.enttype not in (78) --For this enttype data5 and data6 are coupled and handled farther down in the query
-
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data5,
-     a.data5, lu.text, e.data5_lkup, m.read_code, m.desc, a.data5,
-    p.productname, p.gemscriptcode
+     a.data5, lu.text, e.data5_lkup, m.read_code, m.desc, a.data5, p.productname, p.gemscriptcode
 
     UNION
 
@@ -263,19 +259,17 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (78) --For this enttype data5 and data6 are coupled and handled farther down in the query
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 5
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data6_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data6
     left join {sc}.medical m on m.medcode::text =  a.data6 and e.data6_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data6 and e.data6_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid 
-    where ch.ChunkId = {0} AND e.data_fields &gt; 5 and a.enttype not in (78) --For this enttype data5 and data6 are coupled and handled farther down in the query
-
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data6,
-     a.data6, lu.text, e.data6_lkup, m.read_code, m.desc, a.data6,
-    p.productname, p.gemscriptcode
+     a.data6, lu.text, e.data6_lkup, m.read_code, m.desc, a.data6, p.productname, p.gemscriptcode
 
     UNION
 
@@ -304,15 +298,14 @@
     e.data_fields
     from {sc}._chunks ch
     JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 6
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data7_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data7
     left join {sc}.medical m    on m.medcode::text =  a.data7 and e.data7_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data7 and e.data7_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid   
-    where ch.ChunkId = {0} AND e.data_fields &gt; 6
-
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data7,
      a.data7, lu.text, e.data7_lkup, m.read_code, m.desc, a.data7,
     p.productname, p.gemscriptcode
@@ -343,7 +336,7 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (72,116,78) --For these enttypes data1 is the value and data2 is the unit
     join {sc}.entity e on a.enttype = e.enttype
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data1_lkup = lt.name
@@ -353,7 +346,7 @@
     left join {sc}.medical m on m.medcode::text =  a.data1 and e.data1_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data1 and e.data1_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND a.enttype in (72,116,78) --For these enttypes data1 is the value and data2 is the unit
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data1,
      a.data1, lu.text, e.data1_lkup, m.read_code, m.desc, a.data1,
     p.productname, p.gemscriptcode, lu2.text
@@ -384,7 +377,7 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (126,78) --For these datatypes data3 is the value and data4 is the unit
     join {sc}.entity e on a.enttype = e.enttype
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data3_lkup = lt.name
@@ -394,7 +387,7 @@
     left join {sc}.medical m on m.medcode::text =  a.data3 and e.data1_lkup = 'Medical Dictionary'
     left join {sc}.product p on p.prodcode::text =  a.data3 and e.data1_lkup = 'Product Dictionary'
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND a.enttype in (126,78) --For these datatypes data3 is the value and data4 is the unit
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data3,
      a.data3, lu.text, e.data3_lkup, m.read_code, m.desc, a.data3,
     p.productname, p.gemscriptcode, lu2.text
@@ -425,17 +418,17 @@
     p.productname as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
-    join {sc}.entity e on a.enttype = e.enttype
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (78) --For this enttype data5 is the value and data6 is the unit
+    join {sc}.entity e on a.enttype = e.enttype and e.data1_lkup = 'Medical Dictionary' and e.data1_lkup = 'Product Dictionary'
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data5_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data5
     left join {sc}.lookuptype lt2 on e.data6_lkup = lt2.name
     left join {sc}.lookup lu2 on lt2.lookup_type_id = lu2.lookup_type_id and lu2.code::text =  a.data6
-    left join {sc}.medical m on m.medcode::text =  a.data5 and e.data1_lkup = 'Medical Dictionary'
-    left join {sc}.product p on p.prodcode::text =  a.data5 and e.data1_lkup = 'Product Dictionary'
+    left join {sc}.medical m on m.medcode::text =  a.data5
+    left join {sc}.product p on p.prodcode::text =  a.data5
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND a.enttype in (78) --For this enttype data5 is the value and data6 is the unit
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data5,
      a.data5, lu.text, e.data5_lkup, m.read_code, m.desc, a.data5,
     p.productname, p.gemscriptcode, lu2.text
@@ -461,19 +454,18 @@
     '' as gemscript_description,
     e.data_fields
     from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID
+    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (372) --This enttype is for the results of scores and questionnaires
     join {sc}.entity e on a.enttype = e.enttype
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.scoringmethod sm on a.data3 = sm.code::text
     left join {sc}.lookuptype lt4 on e.data4_lkup = lt4.name
     left join {sc}.lookup lu4 on lt4.lookup_type_id = lu4.lookup_type_id and lu4.code::text =  a.data4
     left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0} AND a.enttype in (372) --This enttype is for the results of scores and questionnaires
+    where ch.ChunkId = {0}
     group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, sm.scoringmethod,
      a.data1, lu4.text, e.data4_lkup, a.data1, e.data1_lkup
     ) as a
-    where a.eventdate is not NULL
-    order by a.patid
+    where a.eventdate is not NULL order by a.patid
   </Query>
   <Observation>
     <ObservationDefinition>

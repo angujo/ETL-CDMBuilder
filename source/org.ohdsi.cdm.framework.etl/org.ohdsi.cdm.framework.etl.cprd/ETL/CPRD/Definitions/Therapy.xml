@@ -81,15 +81,14 @@
     when c.constype = 61 then 'Extended Hours'
     end as description,
     c.constype
-    from {sc}.therapy as a
-    JOIN {sc}._chunks ch ON ch.ChunkId = {0} AND a.patid = ch.PERSON_ID
+    from {sc}._chunks ch
+    JOIN {sc}.therapy as a ON a.eventdate is not null AND a.patid = ch.PERSON_ID
     left join {sc}.Product product on a.prodcode = product.prodcode
     left join {sc}.commondosages d on a.dosageid = d.dosageid
     left join {sc}.daysupply_decodes dd on a.prodcode = dd.prodcode and dd.daily_dose = coalesce(d.daily_dose, 0) and dd.qty = coalesce(case when a.qty &lt; 0 then null else a.qty end, 0) and dd.numpacks = coalesce(a.numpacks, 0)
     left join {sc}.daysupply_modes dm on a.prodcode = dm.prodcode
     left join {sc}.consultation c on a.patid = c.patid and a.consid = c.consid
-    where a.eventdate is not null
-    order by a.patid
+    where ch.ChunkId = {0} order by a.patid
   </Query>
   <DrugExposure>
     <DrugExposureDefinition>

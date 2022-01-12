@@ -115,13 +115,13 @@
     t.data6::numeric as range_high
     FROM {sc}._chunks ch
     JOIN {sc}.test t ON t.patid = ch.PERSON_ID
-    JOIN {sc}.entity e ON t.enttype = e.enttype
+    JOIN {sc}.entity e ON t.enttype = e.enttype AND e.data_fields in (7,8) --When data_fields equals 7 or 8 then both operators and units may be present.
     JOIN {sc}.medical m ON t.medcode = m.medcode
     left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 56 /*OPR - Operator*/
     left JOIN {sc}.lookup l2 ON t.data3 = l2.code::text AND l2.lookup_type_id = 83 /*SUM - Specimen Unit of Measure*/
     left JOIN {sc}.lookup l3 ON t.data4 = l3.code::text AND l3.lookup_type_id = 85 /*TQU - Test Qualifier*/
     left join {sc}.consultation c on t.patid = c.patid and t.consid = c.consid
-    WHERE ch.ChunkId = {0} AND e.data_fields in (7,8) --When data_fields equals 7 or 8 then both operators and units may be present.
+    WHERE ch.ChunkId = {0}
 
     UNION
 
@@ -144,11 +144,11 @@
     t.data3::numeric as range_high
     FROM {sc}._chunks ch
     JOIN {sc}.test t ON t.patid = ch.PERSON_ID
-    JOIN {sc}.entity e ON t.enttype = e.enttype
+    JOIN {sc}.entity e ON t.enttype = e.enttype AND e.data_fields = 4 --When data_fields equals 4 then only the value of the text and qualifier is available.
     JOIN {sc}.medical m ON t.medcode = m.medcode
     left JOIN {sc}.lookup l ON t.data1 = l.code::text AND l.lookup_type_id = 85 /*TQU - Test Qualifier*/
     left join {sc}.consultation c on t.patid = c.patid and t.consid = c.consid
-    WHERE ch.ChunkId = {0} AND e.data_fields = 4 --When data_fields equals 4 then only the value of the text and qualifier is available.
+    WHERE ch.ChunkId = {0}
     ) as a
     where a.eventdate is not NULL
     order by a.patid
