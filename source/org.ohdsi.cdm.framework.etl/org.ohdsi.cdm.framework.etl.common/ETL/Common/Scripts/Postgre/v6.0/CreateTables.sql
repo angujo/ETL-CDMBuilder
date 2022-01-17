@@ -267,7 +267,7 @@ CREATE TABLE {sc}.observation
   value_as_number				    NUMERIC			NULL ,
   value_as_string				    VARCHAR(3000)		NULL ,
   value_as_concept_id			    INTEGER			NULL ,
-  qualifier_concept_id			    INTEGER			NULL ,
+  qualifier_concept_id			    numeric 			NULL ,
   unit_concept_id				    INTEGER			NULL ,
   provider_id					    BIGINT			NULL ,
   visit_occurrence_id			    BIGINT			NULL ,
