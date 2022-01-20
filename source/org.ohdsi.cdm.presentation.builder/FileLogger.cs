@@ -13,7 +13,7 @@ namespace org.ohdsi.cdm.presentation.builder
             path = AppDomain.CurrentDomain.BaseDirectory + "\\log"; 
         }
 
-        private void doLog(string cnt)
+        private void DoLog(string cnt)
         {
             if (path.Length <= 0)
             {
@@ -25,7 +25,7 @@ namespace org.ohdsi.cdm.presentation.builder
                 Directory.CreateDirectory(path);
             }
 
-            path = path + "\\" + Settings.Current.Building.LogFilePath;
+            path = path + "\\" + DateTime.Now.ToString("yyyyMMdd")+ Settings.Current.Building.LogFilePath;
 
             if (!File.Exists(path))
             {
@@ -46,7 +46,7 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public static void WriteLog(string content)
         {
-            (new FileLogger()).doLog(content);
+            (new FileLogger()).DoLog(content);
         }
     }
 }

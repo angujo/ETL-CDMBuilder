@@ -64,7 +64,7 @@
     from {sc}._chunks ch 
     JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (72,116,372,78) --These are enttypes where data1 is the value and data2 is the unit
     join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 0
-    left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
+    join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data1_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data1
     left join {sc}.medical m on m.medcode::text = a.data1 and e.data1_lkup = 'Medical Dictionary'

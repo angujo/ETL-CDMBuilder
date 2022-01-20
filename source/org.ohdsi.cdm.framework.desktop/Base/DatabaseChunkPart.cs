@@ -43,6 +43,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             try
             {
                 var timer = new Stopwatch();
+                var _quid="";
                 timer.Start();
                 foreach (var qd in sourceQueryDefinitions)
                 {
@@ -51,13 +52,14 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                     if (qd.CareSites != null) continue;
 
                     fileName = qd.FileName;
-                    LogToFile($"Starting log for file [{fileName}]...");
+                    _quid=Guid.NewGuid().ToString();
+                    LogToFile($"Starting log for file [{fileName}]...",_quid);
 
                     sql = GetSqlHelper.GetSql(sourceEngine.Database,
                         qd.GetSql(vendor, sourceSchemaName),
                         sourceSchemaName);
                     
-                    LogToFile($"QUERY: {sql}");
+                    LogToFile($"QUERY: {sql}",_quid);
                     
                     if (string.IsNullOrEmpty(sql))
                         continue;
@@ -78,7 +80,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
                         }
                     }
                     
-                    LogToFile($"Ending log for file [{fileName}]");
+                    LogToFile($"Ending log for file [{fileName}]",_quid);
                 }
 
                 timer.Stop();
@@ -152,14 +154,16 @@ namespace org.ohdsi.cdm.framework.desktop.Base
             ChunkData = null;
         }
 
-        private void LogToFile(string cnt)
+        private void LogToFile(string cnt,string _guid)
         {
             if (null == FileLog)
             {
                 return;
             }
 
-            FileLog(cnt);
+            FileLog($"[#{_guid}] {cnt}");
         }
+
+        private void LogToFile(string cnt) { LogToFile(cnt,Guid.NewGuid().ToString()); }
     }
 }

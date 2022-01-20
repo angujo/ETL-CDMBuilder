@@ -1,86 +1,83 @@
 ﻿<QueryDefinition>
   <Query>
-    select a.patid,
-    a.eventdate,
-    a.staffid,
-    a.read_code,
-    a.value_as_number,
-    a.unit,
-    a.range_low,
-    a.range_high,
-    right(cast(a.patid as varchar),3) as care_site_id,
-    (cast(a.patid as bigint) * 10000000000) +
-    (cast(date_part('year',a.eventdate) as bigint) * 1000000) +
-    (cast(date_part('month',a.eventdate) as bigint) * 10000) +
-    (cast(date_part('day',a.eventdate) as bigint) * 100) + coalesce(a.constype, 99) as visit_occurrence_id,
-    a.constype,
-    case
-    when a.constype = 0 then 'Data Not Entered'
-    when a.constype = 1 then 'Clinic'
-    when a.constype = 2 then 'Night visit, Deputising service'
-    when a.constype = 3 then 'Follow-up/routine visit'
-    when a.constype = 4 then 'Night visit, Local rota'
-    when a.constype = 5 then 'Mail from patient'
-    when a.constype = 6 then 'Night visit , practice'
-    when a.constype = 7 then 'Out of hours, Practice'
-    when a.constype = 8 then 'Out of hours, Non Practice'
-    when a.constype = 9 then 'Surgery consultation'
-    when a.constype = 10 then 'Telephone call from a patient'
-    when a.constype = 11 then 'Acute visit'
-    when a.constype = 12 then 'Discharge details'
-    when a.constype = 13 then 'Letter from Outpatients'
-    when a.constype = 14 then 'Repeat Issue'
-    when a.constype = 15 then 'Other'
-    when a.constype = 16 then 'Results recording'
-    when a.constype = 17 then 'Mail to patient'
-    when a.constype = 18 then 'Emergency Consultation'
-    when a.constype = 19 then 'Administration'
-    when a.constype = 20 then 'Casualty Attendance'
-    when a.constype = 21 then 'Telephone call to a patient'
-    when a.constype = 22 then 'Third Party Consultation'
-    when a.constype = 23 then 'Hospital Admission'
-    when a.constype = 24 then 'Children''s Home Visit'
-    when a.constype = 25 then 'Day Case Report'
-    when a.constype = 26 then 'GOS18 Report'
-    when a.constype = 27 then 'Home Visit'
-    when a.constype = 28 then 'Hotel Visit'
-    when a.constype = 29 then 'NHS Direct Report'
-    when a.constype = 30 then 'Nursing Home Visit'
-    when a.constype = 31 then 'Residential Home Visit'
-    when a.constype = 32 then 'Twilight Visit'
-    when a.constype = 33 then 'Triage'
-    when a.constype = 34 then 'Walk-in Centre'
-    when a.constype = 35 then 'Co-op Telephone advice'
-    when a.constype = 36 then 'Co-op Surgery Consultation'
-    when a.constype = 37 then 'Co-op Home Visit'
-    when a.constype = 38 then 'Minor Injury Service'
-    when a.constype = 39 then 'Medicine Management'
-    when a.constype = 40 then 'Community Clinic'
-    when a.constype = 41 then 'Community Nursing Note'
-    when a.constype = 42 then 'Community Nursing Report'
-    when a.constype = 43 then 'Data Transferred from other system'
-    when a.constype = 44 then 'Health Authority Entry'
-    when a.constype = 45 then 'Health Visitor Note'
-    when a.constype = 46 then 'Health Visitor Report'
-    when a.constype = 47 then 'Hospital Inpatient Report'
-    when a.constype = 48 then 'Initial Post Discharge Review'
-    when a.constype = 49 then 'Laboratory Request'
-    when a.constype = 50 then 'Night Visit'
-    when a.constype = 51 then 'Radiology Request'
-    when a.constype = 52 then 'Radiology Result'
-    when a.constype = 53 then 'Referral Letter'
-    when a.constype = 54 then 'Social Services Report'
-    when a.constype = 55 then 'Telephone Consultation'
-    when a.constype = 56 then 'Template Entry'
-    when a.constype = 57 then 'GP to GP communication transaction'
-    when a.constype = 58 then 'Non-consultation medication data'
-    when a.constype = 59 then 'Non-consultation data'
-    when a.constype = 60 then 'ePharmacy message'
-    when a.constype = 61 then 'Extended Hours'
-    end as visit_description,
-    CASE a.operator
-    WHEN '=' THEN 4172703
-    WHEN '&gt;' THEN 4172704
+	  select a.patid,
+	  a.eventdate,
+	  a.staffid,
+	  a.read_code,
+	  a.value_as_number,
+	  a.unit,
+	  a.range_low,
+	  a.range_high,
+	  right(cast(a.patid as varchar),5) as care_site_id,
+	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'),coalesce(a.constype, 99))::bigint as visit_occurrence_id,
+	  a.constype,
+	  case
+	  when a.constype = 0 then 'Data Not Entered'
+	  when a.constype = 1 then 'Clinic'
+	  when a.constype = 2 then 'Night visit, Deputising service'
+	  when a.constype = 3 then 'Follow-up/routine visit'
+	  when a.constype = 4 then 'Night visit, Local rota'
+	  when a.constype = 5 then 'Mail from patient'
+	  when a.constype = 6 then 'Night visit , practice'
+	  when a.constype = 7 then 'Out of hours, Practice'
+	  when a.constype = 8 then 'Out of hours, Non Practice'
+	  when a.constype = 9 then 'Surgery consultation'
+	  when a.constype = 10 then 'Telephone call from a patient'
+	  when a.constype = 11 then 'Acute visit'
+	  when a.constype = 12 then 'Discharge details'
+	  when a.constype = 13 then 'Letter from Outpatients'
+	  when a.constype = 14 then 'Repeat Issue'
+	  when a.constype = 15 then 'Other'
+	  when a.constype = 16 then 'Results recording'
+	  when a.constype = 17 then 'Mail to patient'
+	  when a.constype = 18 then 'Emergency Consultation'
+	  when a.constype = 19 then 'Administration'
+	  when a.constype = 20 then 'Casualty Attendance'
+	  when a.constype = 21 then 'Telephone call to a patient'
+	  when a.constype = 22 then 'Third Party Consultation'
+	  when a.constype = 23 then 'Hospital Admission'
+	  when a.constype = 24 then 'Children''s Home Visit'
+	  when a.constype = 25 then 'Day Case Report'
+	  when a.constype = 26 then 'GOS18 Report'
+	  when a.constype = 27 then 'Home Visit'
+	  when a.constype = 28 then 'Hotel Visit'
+	  when a.constype = 29 then 'NHS Direct Report'
+	  when a.constype = 30 then 'Nursing Home Visit'
+	  when a.constype = 31 then 'Residential Home Visit'
+	  when a.constype = 32 then 'Twilight Visit'
+	  when a.constype = 33 then 'Triage'
+	  when a.constype = 34 then 'Walk-in Centre'
+	  when a.constype = 35 then 'Co-op Telephone advice'
+	  when a.constype = 36 then 'Co-op Surgery Consultation'
+	  when a.constype = 37 then 'Co-op Home Visit'
+	  when a.constype = 38 then 'Minor Injury Service'
+	  when a.constype = 39 then 'Medicine Management'
+	  when a.constype = 40 then 'Community Clinic'
+	  when a.constype = 41 then 'Community Nursing Note'
+	  when a.constype = 42 then 'Community Nursing Report'
+	  when a.constype = 43 then 'Data Transferred from other system'
+	  when a.constype = 44 then 'Health Authority Entry'
+	  when a.constype = 45 then 'Health Visitor Note'
+	  when a.constype = 46 then 'Health Visitor Report'
+	  when a.constype = 47 then 'Hospital Inpatient Report'
+	  when a.constype = 48 then 'Initial Post Discharge Review'
+	  when a.constype = 49 then 'Laboratory Request'
+	  when a.constype = 50 then 'Night Visit'
+	  when a.constype = 51 then 'Radiology Request'
+	  when a.constype = 52 then 'Radiology Result'
+	  when a.constype = 53 then 'Referral Letter'
+	  when a.constype = 54 then 'Social Services Report'
+	  when a.constype = 55 then 'Telephone Consultation'
+	  when a.constype = 56 then 'Template Entry'
+	  when a.constype = 57 then 'GP to GP communication transaction'
+	  when a.constype = 58 then 'Non-consultation medication data'
+	  when a.constype = 59 then 'Non-consultation data'
+	  when a.constype = 60 then 'ePharmacy message'
+	  when a.constype = 61 then 'Extended Hours'
+	  end as visit_description,
+	  CASE a.operator
+	  WHEN '=' THEN 4172703
+	  WHEN '&gt;' THEN 4172704
     WHEN '&lt;=' THEN 4171754
     WHEN '&gt;=' THEN 4171755
     WHEN '&lt;' THEN 4171756
