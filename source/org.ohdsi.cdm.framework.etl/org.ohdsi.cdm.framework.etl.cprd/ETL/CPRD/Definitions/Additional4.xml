@@ -9,7 +9,7 @@
     a.unit_source_value,
     right(cast(a.patid as varchar),5) as care_site_id,
     a.constype,
-    concat(a.patid,to_char(a.eventdate,'YYYYMMDD'),coalesce(a.constype, 99))::bigint as visit_occurrence_id,
+    concat(a.patid,to_char(a.eventdate,'YYYYMMDD'))::numeric as visit_occurrence_id,
     qualifier_source_value,
     case a.qualifier_source_value
     when 'Not applicable' then 45882470

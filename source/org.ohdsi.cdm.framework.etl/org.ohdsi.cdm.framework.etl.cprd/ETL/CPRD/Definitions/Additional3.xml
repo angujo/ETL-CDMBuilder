@@ -1,61 +1,61 @@
 ﻿<QueryDefinition>
   <Query>
-    select a.patid,
-    a.eventdate,
-    a.staffid,
-    a.value_as_string,
-    a.value_as_number,
-    a.value_as_date,
-    a.unit_source_value,
-    right(cast(a.patid as varchar),5) as care_site_id,
-    a.constype,
-    concat(a.patid,to_char(a.eventdate,'YYYYMMDD'),coalesce(a.constype, 99))::bigint as visit_occurrence_id,
-    qualifier_source_value,
-    case a.qualifier_source_value
-    when 'Not applicable' then 45882470
-    when 'Abnormal' then 45878745
-    when 'Absent' then 45884086
-    when 'High' then 45876384
-    when 'Low' then 45881666
-    when 'Negative' then 45878583
-    when 'Normal' then 45884153
-    when 'Positive' then 45884084
-    when 'Present' then 45879438
-    when 'Trace' then 45881796
-    when 'Unknown' then 45877986
-    when 'Very high' then 45879181
-    when 'Very low' then 45879182
-    end as qualifier_concept_id,
-    data,
-    concat(cast(enttype as varchar), '-', category, '-', description, '-', data)  as source_value
-    from
-    (
-    select a.patid,
-    c.eventdate,
-    con.constype,
-    c.consid,
-    c.staffid,
-    a.enttype,
-    e.category,
-    e.description,
-    e.data3 as data,
-    case when e.data3_lkup in ('Medical Dictionary', 'Product Dictionary') then null
-    else  a.data3
-    end as value_as_number,
-    case when e.data3_lkup = 'Medical Dictionary' then m.read_code
-    when e.data3_lkup = 'Product Dictionary' then p.gemscriptcode
-    else lu.text
-    end as value_as_string,
-    case when e.data3_lkup = 'dd/mm/yyyy' then a.data3
-    end as value_as_date,
-    '' as unit_source_value,
-    '' as qualifier_source_value,
-    m.desc as read_code_description,
-    p.productname as gemscript_description,
-    e.data_fields
-    from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
-    join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 2
+	  select a.patid,
+	  a.eventdate,
+	  a.staffid,
+	  a.value_as_string,
+	  a.value_as_number,
+	  a.value_as_date,
+	  a.unit_source_value,
+	  right(cast(a.patid as varchar),5) as care_site_id,
+	  a.constype,
+	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'))::numeric as visit_occurrence_id,
+	  qualifier_source_value,
+	  case a.qualifier_source_value
+	  when 'Not applicable' then 45882470
+	  when 'Abnormal' then 45878745
+	  when 'Absent' then 45884086
+	  when 'High' then 45876384
+	  when 'Low' then 45881666
+	  when 'Negative' then 45878583
+	  when 'Normal' then 45884153
+	  when 'Positive' then 45884084
+	  when 'Present' then 45879438
+	  when 'Trace' then 45881796
+	  when 'Unknown' then 45877986
+	  when 'Very high' then 45879181
+	  when 'Very low' then 45879182
+	  end as qualifier_concept_id,
+	  data,
+	  concat(cast(enttype as varchar), '-', category, '-', description, '-', data)  as source_value
+	  from
+	  (
+	  select a.patid,
+	  c.eventdate,
+	  con.constype,
+	  c.consid,
+	  c.staffid,
+	  a.enttype,
+	  e.category,
+	  e.description,
+	  e.data3 as data,
+	  case when e.data3_lkup in ('Medical Dictionary', 'Product Dictionary') then null
+	  else  a.data3
+	  end as value_as_number,
+	  case when e.data3_lkup = 'Medical Dictionary' then m.read_code
+	  when e.data3_lkup = 'Product Dictionary' then p.gemscriptcode
+	  else lu.text
+	  end as value_as_string,
+	  case when e.data3_lkup = 'dd/mm/yyyy' then a.data3
+	  end as value_as_date,
+	  '' as unit_source_value,
+	  '' as qualifier_source_value,
+	  m.desc as read_code_description,
+	  p.productname as gemscript_description,
+	  e.data_fields
+	  from {sc}._chunks ch
+	  JOIN {sc}.additional a ON a.patid = ch.PERSON_ID and a.enttype not in (372,78,126) --For these enttypes data3 and data4 are coupled and handled farther down in the query
+	  join {sc}.entity e on a.enttype = e.enttype AND e.data_fields &gt; 2
     left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
     left join {sc}.lookuptype lt on e.data3_lkup = lt.name
     left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data3

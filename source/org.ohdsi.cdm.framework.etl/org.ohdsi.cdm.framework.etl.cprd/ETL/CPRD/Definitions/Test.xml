@@ -9,7 +9,7 @@
 	  a.range_low,
 	  a.range_high,
 	  right(cast(a.patid as varchar),5) as care_site_id,
-	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'),coalesce(a.constype, 99))::bigint as visit_occurrence_id,
+	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'))::numeric as visit_occurrence_id,
 	  a.constype,
 	  case
 	  when a.constype = 0 then 'Data Not Entered'

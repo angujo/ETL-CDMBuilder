@@ -155,7 +155,7 @@ namespace org.ohdsi.cdm.framework.common.Extensions
                 if (value is DBNull || string.IsNullOrEmpty(value.ToString()))
                     return null;
 
-                return Convert.ToInt64(value);
+                return Convert.ToInt64(value.ToString());
             }
             catch (Exception e)
             {

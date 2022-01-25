@@ -25,7 +25,7 @@ namespace org.ohdsi.cdm.presentation.builder
                 Directory.CreateDirectory(path);
             }
 
-            path = path + "\\" + DateTime.Now.ToString("yyyyMMdd")+ Settings.Current.Building.LogFilePath;
+            path = path + "\\" + Settings.Current.Building.LogFilePath;
 
             if (!File.Exists(path))
             {

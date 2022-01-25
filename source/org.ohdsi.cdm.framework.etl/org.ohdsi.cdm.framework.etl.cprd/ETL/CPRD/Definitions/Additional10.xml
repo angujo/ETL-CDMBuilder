@@ -1,74 +1,74 @@
 ﻿<QueryDefinition>
   <Query>
-    select a.patid,
-    a.eventdate,
-    a.staffid,
-    a.value_as_string,
-    a.value_as_number,
-    a.value_as_date,
-    a.unit_source_value,
-    right(cast(a.patid as varchar),5) as care_site_id,
-    a.constype,
-    9999 as visit_occurrence_id,
-    qualifier_source_value,
-    case a.qualifier_source_value
-    when 'Not applicable' then 45882470
-    when 'Abnormal' then 45878745
-    when 'Absent' then 45884086
-    when 'High' then 45876384
-    when 'Low' then 45881666
-    when 'Negative' then 45878583
-    when 'Normal' then 45884153
-    when 'Positive' then 45884084
-    when 'Present' then 45879438
-    when 'Trace' then 45881796
-    when 'Unknown' then 45877986
-    when 'Very high' then 45879181
-    when 'Very low' then 45879182
-    end as qualifier_concept_id,
-    data,
-    concat(cast(enttype as varchar), '-', category, '-', description, '-', data)  as source_value
-    from
-    (
-    select a.patid,
-    c.eventdate,
-    con.constype,
-    c.consid,
-    c.staffid,
-    a.enttype,
-    e.category,
-    e.description,
-    e.data5 as data,
-    case when e.data5_lkup in ('Medical Dictionary', 'Product Dictionary') then null
-    else  a.data5
-    end as value_as_number,
-    case when e.data5_lkup = 'Medical Dictionary' then m.read_code
-    when e.data5_lkup = 'Product Dictionary' then p.gemscriptcode
-    else lu.text
-    end as value_as_string,
-    case when e.data5_lkup = 'dd/mm/yyyy' then a.data5
-    end as value_as_date,
-    lu2.text as unit_source_value,
-    '' as qualifier_source_value,
-    m.desc as read_code_description,
-    p.productname as gemscript_description,
-    e.data_fields
-    from {sc}._chunks ch
-    JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (78) --For this enttype data5 is the value and data6 is the unit
-    join {sc}.entity e on a.enttype = e.enttype and e.data1_lkup = 'Medical Dictionary' and e.data1_lkup = 'Product Dictionary'
-    left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
-    left join {sc}.lookuptype lt on e.data5_lkup = lt.name
-    left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data5
-    left join {sc}.lookuptype lt2 on e.data6_lkup = lt2.name
-    left join {sc}.lookup lu2 on lt2.lookup_type_id = lu2.lookup_type_id and lu2.code::text =  a.data6
-    left join {sc}.medical m on m.medcode::text =  a.data5
-    left join {sc}.product p on p.prodcode::text =  a.data5
-    left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
-    where ch.ChunkId = {0}
-    group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data5,
-     a.data5, lu.text, e.data5_lkup, m.read_code, m.desc, a.data5,
-    p.productname, p.gemscriptcode, lu2.text) as a
-    where a.eventdate is not NULL order by a.patid
+	  select a.patid,
+	  a.eventdate,
+	  a.staffid,
+	  a.value_as_string,
+	  a.value_as_number,
+	  a.value_as_date,
+	  a.unit_source_value,
+	  right(cast(a.patid as varchar),5) as care_site_id,
+	  a.constype,
+	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'))::numeric as visit_occurrence_id,
+	  qualifier_source_value,
+	  case a.qualifier_source_value
+	  when 'Not applicable' then 45882470
+	  when 'Abnormal' then 45878745
+	  when 'Absent' then 45884086
+	  when 'High' then 45876384
+	  when 'Low' then 45881666
+	  when 'Negative' then 45878583
+	  when 'Normal' then 45884153
+	  when 'Positive' then 45884084
+	  when 'Present' then 45879438
+	  when 'Trace' then 45881796
+	  when 'Unknown' then 45877986
+	  when 'Very high' then 45879181
+	  when 'Very low' then 45879182
+	  end as qualifier_concept_id,
+	  data,
+	  concat(cast(enttype as varchar), '-', category, '-', description, '-', data)  as source_value
+	  from
+	  (
+	  select a.patid,
+	  c.eventdate,
+	  con.constype,
+	  c.consid,
+	  c.staffid,
+	  a.enttype,
+	  e.category,
+	  e.description,
+	  e.data5 as data,
+	  case when e.data5_lkup in ('Medical Dictionary', 'Product Dictionary') then null
+	  else  a.data5
+	  end as value_as_number,
+	  case when e.data5_lkup = 'Medical Dictionary' then m.read_code
+	  when e.data5_lkup = 'Product Dictionary' then p.gemscriptcode
+	  else lu.text
+	  end as value_as_string,
+	  case when e.data5_lkup = 'dd/mm/yyyy' then a.data5
+	  end as value_as_date,
+	  lu2.text as unit_source_value,
+	  '' as qualifier_source_value,
+	  m.desc as read_code_description,
+	  p.productname as gemscript_description,
+	  e.data_fields
+	  from {sc}._chunks ch
+	  JOIN {sc}.additional a ON a.patid = ch.PERSON_ID AND a.enttype in (78) --For this enttype data5 is the value and data6 is the unit
+	  join {sc}.entity e on a.enttype = e.enttype and e.data1_lkup = 'Medical Dictionary' and e.data1_lkup = 'Product Dictionary'
+	  left join {sc}.clinical c on c.patid = a.patid and c.adid = a.adid
+	  left join {sc}.lookuptype lt on e.data5_lkup = lt.name
+	  left join {sc}.lookup lu on lt.lookup_type_id = lu.lookup_type_id and lu.code::text =  a.data5
+	  left join {sc}.lookuptype lt2 on e.data6_lkup = lt2.name
+	  left join {sc}.lookup lu2 on lt2.lookup_type_id = lu2.lookup_type_id and lu2.code::text =  a.data6
+	  left join {sc}.medical m on m.medcode::text =  a.data5
+	  left join {sc}.product p on p.prodcode::text =  a.data5
+	  left join {sc}.consultation con on a.patid = con.patid and c.consid = con.consid
+	  where ch.ChunkId = {0}
+	  group by a.patid, c.eventdate, con.constype, c.consid, c.staffid, e.category, a.enttype, e.description, e.data_fields, e.data5,
+	  a.data5, lu.text, e.data5_lkup, m.read_code, m.desc, a.data5,
+	  p.productname, p.gemscriptcode, lu2.text) as a
+	  where a.eventdate is not NULL order by a.patid
   </Query>
   <Observation>
     <ObservationDefinition>

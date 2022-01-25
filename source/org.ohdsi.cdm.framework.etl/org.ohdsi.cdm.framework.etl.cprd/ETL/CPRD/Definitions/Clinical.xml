@@ -4,7 +4,7 @@
 	  a.eventdate,
 	  a.patid,
 	  a.staffid,
-	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'),coalesce(a.constype, 99))::bigint as visit_occurrence_id,
+	  concat(a.patid,to_char(a.eventdate,'YYYYMMDD'))::numeric as visit_occurrence_id,
 	  right(cast(a.patid as varchar),5) as care_site_id,
 	  m.read_code,
 	  case
