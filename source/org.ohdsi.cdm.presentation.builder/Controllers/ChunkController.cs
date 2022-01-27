@@ -34,7 +34,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         {
             var chunks = new List<ChunkRecord>();
 
-            Console.WriteLine("Generating chunk ids...");
+            FileLogger.Console("Generating chunk ids...");
             _dbSource.CreateChunkTable();
             _dbSource.CreateIndexesChunkTable();
 
@@ -65,7 +65,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 saver.Commit();
             }
 
-            Console.WriteLine("Chunk ids were generated and saved, total count=" + chunkId);
+            FileLogger.Console("Chunk ids were generated and saved, total count=" + chunkId);
 
             return chunkId;
         }
@@ -80,6 +80,10 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             var batch = new List<KeyValuePair<string, string>>(batchSize);
 
             var query = GetSqlHelper.GetSql(Settings.Current.Building.SourceEngine.Database, Settings.Current.Building.BatchScript, Settings.Current.Building.SourceSchema);
+
+            FileLogger.WriteLog($"Batch Script: {query}");
+            FileLogger.WriteLog($"Batchs: {batches}");
+            FileLogger.WriteLog($"Batch Size: {batchSize}");
 
             foreach (var reader in _dbSource.GetPersonKeys(query, batches, batchSize))
             {

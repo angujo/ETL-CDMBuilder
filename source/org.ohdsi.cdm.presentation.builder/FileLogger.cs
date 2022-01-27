@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
 
@@ -8,17 +9,11 @@ namespace org.ohdsi.cdm.presentation.builder
     {
         private string path;
 
+        private static BlockingCollection<string> queue=new BlockingCollection<string>();
+
         public FileLogger()
         {
             path = AppDomain.CurrentDomain.BaseDirectory + "\\log"; 
-        }
-
-        private void DoLog(string cnt)
-        {
-            if (path.Length <= 0)
-            {
-                return;
-            }
 
             if (!Directory.Exists(path))
             {
@@ -34,19 +29,58 @@ namespace org.ohdsi.cdm.presentation.builder
                 sw.WriteLine(
                     "-- ------------------------------------ NEW LOG FILE -------------------------------- --");
             }
+        }
 
-            // This text is always added, making the file longer over time
-            // if it is not deleted.
-            using (StreamWriter sw = File.AppendText(path))
+        private void DoLog(string cnt)
+        {
+            if (path.Length <= 0)
             {
-                var str = DateTime.Now.ToString("s", DateTimeFormatInfo.InvariantInfo);
-                sw.WriteLine($"{str} : {cnt}");
+                return;
             }
+
+            if (!IsFileLocked())
+            {
+                // This text is always added, making the file longer over time
+                // if it is not deleted.
+                try {
+                    using StreamWriter sw = File.AppendText(path);
+                    var str = DateTime.Now.ToString("s", DateTimeFormatInfo.InvariantInfo);
+                    sw.WriteLine($"{str} : {cnt}");
+                }
+                catch(Exception) { }
+            }
+        }
+
+        protected virtual bool IsFileLocked()
+        {
+            try
+            {
+                using (FileStream stream = (new FileInfo(path)).Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+
+            //file is not locked
+            return false;
         }
 
         public static void WriteLog(string content)
         {
             (new FileLogger()).DoLog(content);
+        }
+
+        public static void Console(string content) {
+            WriteLog(content);
+            System.Console.WriteLine(content);
         }
     }
 }

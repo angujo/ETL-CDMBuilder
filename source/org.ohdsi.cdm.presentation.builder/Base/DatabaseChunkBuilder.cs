@@ -41,7 +41,7 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 var timer = new Stopwatch();
                 timer.Start();
                 
-                FileLogger.WriteLog("Query Loader Start");
+                FileLogger.WriteLog($"[CHUNK#{_chunkId}] Query Loader Start");
 
                 var result = part.Load(sourceEngine, sourceSchemaName, sourceQueryDefinitions, sourceConnection, vendor);
                 if (result.Value != null)

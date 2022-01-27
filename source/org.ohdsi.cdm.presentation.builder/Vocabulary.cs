@@ -84,72 +84,69 @@ namespace org.ohdsi.cdm.presentation.builder
 
                     foreach (var conceptIdMapper in c.ConceptIdMappers)
                     {
-                        if (!string.IsNullOrEmpty(conceptIdMapper.Lookup))
+                        if (string.IsNullOrEmpty(conceptIdMapper.Lookup) || _lookups.ContainsKey(conceptIdMapper.Lookup))
+                            continue;
+                        string sql = string.Empty;
+                        var vendorFolder = Settings.Current.Building.VendorFolder;
+
+                        var baseSql = string.Empty;
+                        var sqlFileDestination = string.Empty;
+
+                        baseSql = File.ReadAllText(Path.Combine(Settings.Current.BuilderFolder,
+                            @"ETL\Common\Lookups\Base.sql"));
+
+                        sqlFileDestination = Path.Combine(Settings.Current.BuilderFolder,
+                                                            vendorFolder,
+                                                            "Lookups",
+                                                            conceptIdMapper.Lookup + ".sql");
+
+                        sql = File.ReadAllText(sqlFileDestination);
+
+                        sql = sql.Replace("{base}", baseSql);
+                        sql = sql.Replace("{sc}", Settings.Current.Building.VocabSchema);
+
+                        try
                         {
-                            if (!_lookups.ContainsKey(conceptIdMapper.Lookup))
+                            Console.WriteLine(conceptIdMapper.Lookup + " - Loading...");
+
+                            var timer = new Stopwatch();
+                            timer.Start();
+
+                            FileLogger.WriteLog(conceptIdMapper.Lookup + " - Loading into RAM...");
+
+                            Logger.Write(null, LogMessageTypes.Info, conceptIdMapper.Lookup + " - Loading into RAM...");
+
+                            using (var connection = SqlConnectionHelper.OpenOdbcConnection(Settings.Current.Building.VocabularyConnectionString))
+                            using (var command = new OdbcCommand(sql, connection) { CommandTimeout = 0 })
+                            using (var reader = command.ExecuteReader())
                             {
-                                string sql = string.Empty;
-                                var vendorFolder = Settings.Current.Building.VendorFolder;
-
-                                var baseSql = string.Empty;
-                                var sqlFileDestination = string.Empty;
-
-                                baseSql = File.ReadAllText(Path.Combine(Settings.Current.BuilderFolder,
-                                    @"ETL\Common\Lookups\Base.sql"));
-
-                                sqlFileDestination = Path.Combine(Settings.Current.BuilderFolder,
-                                                                  vendorFolder,
-                                                                  "Lookups",
-                                                                  conceptIdMapper.Lookup + ".sql");
-
-                                sql = File.ReadAllText(sqlFileDestination);
-
-                                sql = sql.Replace("{base}", baseSql);
-                                sql = sql.Replace("{sc}", Settings.Current.Building.VocabSchema);
-
-                                try
+                                Console.WriteLine(conceptIdMapper.Lookup + " - filling");
+                                var lookup = new Lookup();
+                                while (reader.Read())
                                 {
-                                    Console.WriteLine(conceptIdMapper.Lookup + " - Loading...");
-
-                                    var timer = new Stopwatch();
-                                    timer.Start();
-
-                                    FileLogger.WriteLog(conceptIdMapper.Lookup + " - Loading into RAM...");
-
-                                    Logger.Write(null, LogMessageTypes.Info, conceptIdMapper.Lookup + " - Loading into RAM...");
-
-                                    using (var connection = SqlConnectionHelper.OpenOdbcConnection(Settings.Current.Building.VocabularyConnectionString))
-                                    using (var command = new OdbcCommand(sql, connection) { CommandTimeout = 0 })
-                                    using (var reader = command.ExecuteReader())
-                                    {
-                                        Console.WriteLine(conceptIdMapper.Lookup + " - filling");
-                                        var lookup = new Lookup();
-                                        while (reader.Read())
-                                        {
-                                            var lv = CreateLookupValue(reader);
-                                            lookup.Add(lv);
-                                        }
-
-                                        _lookups.Add(conceptIdMapper.Lookup, lookup);
-                                    }
-                                    
-                                    FileLogger.WriteLog(conceptIdMapper.Lookup + " - Done");
-
-                                    Console.WriteLine(conceptIdMapper.Lookup + " - Done");
-                                    timer.Stop();
-                                    Logger.Write(null, LogMessageTypes.Info,
-                                        $"DONE - {timer.ElapsedMilliseconds} ms | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}");
+                                    var lv = CreateLookupValue(reader);
+                                    lookup.Add(lv);
                                 }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("Lookup error [file]: " + sqlFileDestination);
-                                    Console.WriteLine("Lookup error [query]: " + sql);
-                                    Logger.WriteWarning("Lookup error [file]: " + sqlFileDestination);
-                                    Logger.WriteWarning("Lookup error [query]: " + sql);
-                                    throw;
-                                }
+
+                                _lookups.Add(conceptIdMapper.Lookup, lookup);
                             }
+                                    
+                            FileLogger.WriteLog($"{conceptIdMapper.Lookup} - Done ({timer.ElapsedMilliseconds} ms | {_lookups[conceptIdMapper.Lookup].KeysCount} keys)");
+
+                            Console.WriteLine(conceptIdMapper.Lookup + " - Done");
+                            timer.Stop();
+                            Logger.Write(null, LogMessageTypes.Info,
+                                $"DONE - {timer.ElapsedMilliseconds} ms | KeysCount={_lookups[conceptIdMapper.Lookup].KeysCount}");
                         }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Lookup error [file]: " + sqlFileDestination);
+                            Console.WriteLine("Lookup error [query]: " + sql);
+                            Logger.WriteWarning("Lookup error [file]: " + sqlFileDestination);
+                            Logger.WriteWarning("Lookup error [query]: " + sql);
+                            throw;
+                        }
+
                     }
                 }
             }

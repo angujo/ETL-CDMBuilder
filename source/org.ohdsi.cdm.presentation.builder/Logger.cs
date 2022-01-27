@@ -15,6 +15,21 @@ namespace org.ohdsi.cdm.presentation.builder
             _threadlock = new object();
         }
 
+        public static void WriteInfo(string message) {
+            WriteMessage(null, message);
+        }
+
+        public static void WriteInfo(int? chunkId, string message) {
+            WriteMessage(chunkId, message);
+        }
+
+        public static void WriteMessage(string message) {
+            WriteMessage(null, message);
+        }
+
+        public static void WriteMessage(int? chunkId, string message) {
+            Write(chunkId, LogMessageTypes.Info,message); 
+        }
 
         public static void WriteError(Exception e)
         {

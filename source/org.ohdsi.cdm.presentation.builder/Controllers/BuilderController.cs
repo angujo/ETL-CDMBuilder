@@ -243,6 +243,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 if (Settings.Current.Building.ChunksCount == 0)
                 {
                     Settings.Current.Building.ChunksCount = _chunkController.CreateChunks();
+                    FileLogger.WriteLog($"Chunks Created : {Settings.Current.Building.ChunksCount} Chunks");
                 }
 
                 vocabulary.Fill(false, false);
@@ -269,6 +270,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                         {
                             var timer = new Stopwatch();
                             timer.Start();
+                            Logger.WriteMessage(data.ChunkData.ChunkId,"Starting chunk run:");
+
                             data.Save(Settings.Current.Building.Cdm,
                                 Settings.Current.Building.DestinationConnectionString,
                                 Settings.Current.Building.DestinationEngine,
@@ -276,7 +279,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                                 Settings.Current.Building.CdmSchema);
                             Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
                             timer.Stop();
-                            Logger.Write(data.ChunkData.ChunkId, LogMessageTypes.Info,
+
+                            Logger.WriteInfo(data.ChunkData.ChunkId,
                                 $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
                         }
 
@@ -289,7 +293,8 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
 
                 Parallel.For(0, Settings.Current.Building.ChunksCount,
-                    new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism }, (chunkId, state) =>
+                    new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism },
+                    (chunkId, state) =>
                       {
                           if (CurrentState != BuilderState.Running)
                               state.Break();

@@ -108,24 +108,21 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
             var allChunksComplete = false;
 
             if (Settings.Current.Building.BuildingState.BuildingComplete) return true;
-            if (_builderController.CurrentState == BuilderState.Error) return false;
+            if (_builderController.CurrentState == BuilderState.Error || 
+                !Settings.Current.Building.BuildingState.LookupCreated) return false;
 
 
-            if (Settings.Current.Building.BuildingState.LookupCreated)
+            if (!Settings.Current.Building.BuildingState.BuildingStarted)
             {
-                if (!Settings.Current.Building.BuildingState.BuildingStarted)
-                {
-                    UpdateDate("BuildingStart");
-                }
+                UpdateDate("BuildingStart");
+            }
 
-                _builderController.Build(vocabulary);
+            _builderController.Build(vocabulary);
 
-                if (_builderController.CurrentState != BuilderState.Error)
-                {
-                    allChunksComplete = true;
-                    UpdateDate("BuildingEnd");
-                }
-
+            if (_builderController.CurrentState != BuilderState.Error)
+            {
+                allChunksComplete = true;
+                UpdateDate("BuildingEnd");
             }
             return allChunksComplete;
         }

@@ -53,7 +53,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
 
                     fileName = qd.FileName;
                     _quid=Guid.NewGuid().ToString();
-                    LogToFile($"Starting log for file [{fileName}]...",_quid);
+                    LogToFile($"[CHUNK#{ChunkId}] Starting log for file [{fileName}]...",_quid);
 
                     sql = GetSqlHelper.GetSql(sourceEngine.Database,
                         qd.GetSql(vendor, sourceSchemaName),
