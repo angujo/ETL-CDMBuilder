@@ -53,14 +53,16 @@ namespace org.ohdsi.cdm.presentation.builder.Base
                 Logger.Write(_chunkId, LogMessageTypes.Info,
                     $"ChunkId={_chunkId} was loaded - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
 
+                Logger.WriteInfo(_chunkId, $"Chunk#{_chunkId} Start Build...");
                 part.Build();
+                Logger.WriteInfo(_chunkId, $"Chunk#{_chunkId} End Build");
 
                 return part;
             }
             catch (Exception e)
             {
+                Logger.WriteError(e);
                 Logger.WriteError(_chunkId, e);
-
                 throw;
             }
         }

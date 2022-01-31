@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS {sc}.concept_synonym;
 DROP TABLE IF EXISTS {sc}.domain;
 DROP TABLE IF EXISTS {sc}.drug_strength;
 DROP TABLE IF EXISTS {sc}.relationship;
-DROP TABLE IF EXISTS {sc}.source_to_concept_map;
+-- DROP TABLE IF EXISTS {sc}.source_to_concept_map;
 DROP TABLE IF EXISTS {sc}.vocabulary;
 
 CREATE TABLE {sc}.concept

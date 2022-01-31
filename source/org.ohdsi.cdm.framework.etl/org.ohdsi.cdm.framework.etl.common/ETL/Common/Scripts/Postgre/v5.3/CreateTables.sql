@@ -135,10 +135,10 @@ CREATE TABLE IF NOT EXISTS {sc}.condition_occurrence
    condition_type_concept_id      integer       NOT NULL,
    stop_reason                    varchar(20),
    provider_id                    bigint,
-   visit_occurrence_id            numeric,
+   visit_occurrence_id            bigint,
    visit_detail_id                bigint,
    condition_status_concept_id    integer,
-   condition_source_value         varchar(50),
+   condition_source_value         varchar(450),
    condition_source_concept_id    integer,
    condition_status_source_value  varchar(50)
   
@@ -194,7 +194,7 @@ CREATE TABLE IF NOT EXISTS {sc}.device_exposure
    unique_device_id                varchar(50),
    quantity                        integer,
    provider_id                     bigint,
-   visit_occurrence_id             numeric,
+   visit_occurrence_id             bigint,
    visit_detail_id                 bigint,
    device_source_value             varchar(100),
    device_source_concept_id        integer
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS {sc}.drug_exposure
    route_concept_id              integer,
    lot_number                    varchar(50),
    provider_id                   bigint,
-   visit_occurrence_id           numeric,
+   visit_occurrence_id           bigint,
    visit_detail_id               bigint,
    drug_source_value             varchar(50),
    drug_source_concept_id        integer,
@@ -309,7 +309,7 @@ CREATE TABLE IF NOT EXISTS {sc}.measurement
    range_low                      numeric,
    range_high                     numeric,
    provider_id                    bigint,
-   visit_occurrence_id            numeric,
+   visit_occurrence_id            bigint,
    visit_detail_id                bigint,
    measurement_source_value       varchar(100),
    measurement_source_concept_id  integer,
@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS {sc}.note
    encoding_concept_id    integer        NOT NULL,
    language_concept_id    integer        NOT NULL,
    provider_id            integer,
-   visit_occurrence_id    numeric,
+   visit_occurrence_id    bigint,
    visit_detail_id        integer,
    note_source_value      varchar(50)
 );
@@ -381,10 +381,10 @@ CREATE TABLE IF NOT EXISTS {sc}.observation
    value_as_number                numeric,
    value_as_string                varchar(2000),
    value_as_concept_id            integer,
-   qualifier_concept_id           numeric ,
+   qualifier_concept_id           integer ,
    unit_concept_id                integer,
    provider_id                    bigint,
-   visit_occurrence_id            numeric,
+   visit_occurrence_id            bigint,
    visit_detail_id                bigint,
    observation_source_value       varchar(250),
    observation_source_concept_id  integer,
@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS {sc}.procedure_occurrence
    modifier_concept_id          integer,
    quantity                     integer,
    provider_id                  bigint,
-   visit_occurrence_id          numeric,
+   visit_occurrence_id          bigint,
    visit_detail_id              bigint,
    procedure_source_value       varchar(50),
    procedure_source_concept_id  integer,
@@ -541,12 +541,12 @@ CREATE TABLE IF NOT EXISTS {sc}.visit_detail
    admitting_source_value          varchar(50),
    discharge_to_source_value       varchar(50),
    visit_detail_parent_id          bigint,
-   visit_occurrence_id             numeric        NOT NULL
+   visit_occurrence_id             bigint        NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS {sc}.visit_occurrence
 (
-   visit_occurrence_id            numeric        NOT NULL,
+   visit_occurrence_id            bigint        NOT NULL,
    person_id                      bigint        NOT NULL,
    visit_concept_id               integer       NOT NULL,
    visit_start_date               date          NOT NULL,

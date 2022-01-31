@@ -1,28 +1,28 @@
 ﻿<QueryDefinition>
   <Query>
 	  with tests as (
-	  select t.patid, t.eventdate, t.consid, t.staffid, t.data1, t.data2, t.data3, t.data4, t.data5, t.data6 from {sc}._chunks ch join {sc}.test t on t.eventdate is not null and ch.person_id = t.patid
+	  select t.enttype, t.patid, t.eventdate, t.medcode, t.consid, t.staffid, t.data1, t.data2, t.data3, t.data4, t.data5, t.data6 from {sc}._chunks ch join {sc}.test t on t.eventdate is not null and ch.person_id = t.patid
 	  where ch.ChunkId = {0}
 	  ),
 
 	  entities as (
-	  select e.description, e.enttype, e.data_fields from entity e join tests t on e.enttype = t.enttype and e.data_fields in (7,8, 4)
-	  group by e.description, e.enttype, e.data_fields
+	  select e.description, e.enttype, e.data_fields from {sc}.entity e 
+	  where e.data_fields in (7,8, 4) and exists (select 1 from tests t where e.enttype = t.enttype)
 	  ),
 
 	  meds as (
-	  select m.read_code, m.desc, m.medcode from {sc}.medical m join tests t on t.medcode = m.medcode
-	  group by m.read_code, m.desc, m.medcode
+	  select m.read_code, m.desc, m.medcode from {sc}.medical m 
+	  where exists (select 1 from tests t where t.medcode = m.medcode)
 	  ),
 
 	  lookups as (
-	  select l.lookup_type_id, l."text", l.code from {sc}.lookup l join tests t on t.l.code::text in (t.data1, t.data3, t.data4) and l.lookup_type_id in (83, 85, 56)
-	  group by l.lookup_type_id, l.code, l."text"
+	  select l.lookup_type_id, l."text", l.code from {sc}.lookup l 
+	  where l.lookup_type_id in (83, 85, 56) and exists (select 1 from tests t where l.code::text in (t.data1, t.data3, t.data4))
 	  ),
 
 	  consults as (
-	  select c.constype, c.patid, c.consid from {src}.consultation c join tests t on t.patid = c.patid and t.consid = c.consid
-	  group by c.constype, c.patid, c.consid
+	  select c.constype, c.patid, c.consid from {sc}.consultation c 
+	  where exists (select 1 from tests t where t.patid = c.patid and t.consid = c.consid)
 	  ),
 
 	  constypes(ctype, vdesc) as (

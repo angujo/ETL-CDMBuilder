@@ -107,6 +107,7 @@ namespace org.ohdsi.cdm.framework.desktop.Base
         {
             Console.WriteLine($"Building CDM chunkId={ChunkId} ...");
 
+
             foreach (var pb in PersonBuilders)
             {
                 var result = pb.Value.Value.Build(ChunkData, OffsetManager);

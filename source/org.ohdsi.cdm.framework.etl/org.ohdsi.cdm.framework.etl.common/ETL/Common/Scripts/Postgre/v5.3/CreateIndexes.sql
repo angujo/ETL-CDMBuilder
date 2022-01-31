@@ -1,4 +1,6 @@
+/* DISABLE ALL FOR NOW */
 /* Unique */
+/*
 CREATE UNIQUE INDEX attribute_definition_attribute_definition_id_un ON {sc}.attribute_definition USING btree (attribute_definition_id);
 CREATE UNIQUE INDEX care_site_care_site_id_un ON {sc}.care_site USING btree (care_site_id);
 CREATE UNIQUE INDEX cohort_definition_cohort_definition_id_un ON {sc}.cohort_definition USING btree (cohort_definition_id);
@@ -28,8 +30,9 @@ CREATE UNIQUE INDEX specimen_specimen_id_un ON {sc}.specimen USING btree (specim
 CREATE UNIQUE INDEX visit_detail_visit_detail_id_un ON {sc}.visit_detail USING btree (visit_detail_id);
 CREATE UNIQUE INDEX visit_occurrence_visit_occurrence_id_un ON {sc}.visit_occurrence USING btree (visit_occurrence_id);
 CREATE UNIQUE INDEX vocabulary_vocabulary_id_un ON {sc}.vocabulary USING btree (vocabulary_id);
-
+*/
 /*  Indexes */
+/*
 CREATE INDEX visit_occurrence_person_id_idx ON {sc}.visit_occurrence USING btree (person_id);
 CREATE INDEX visit_occurrence_visit_concept_id_idx ON {sc}.visit_occurrence USING btree (visit_concept_id);
 CREATE INDEX visit_occurrence_visit_type_concept_id_idx ON {sc}.visit_occurrence USING btree (visit_type_concept_id);
@@ -212,3 +215,4 @@ CREATE INDEX cdm_domain_meta_domain_id_idx ON {sc}.cdm_domain_meta USING btree (
 CREATE INDEX care_site_place_of_service_concept_id_idx ON {sc}.care_site USING btree (place_of_service_concept_id);
 CREATE INDEX care_site_location_id_idx ON {sc}.care_site USING btree (location_id);
 CREATE INDEX attribute_definition_attribute_type_concept_id_idx ON {sc}.attribute_definition USING btree (attribute_type_concept_id);
+*/

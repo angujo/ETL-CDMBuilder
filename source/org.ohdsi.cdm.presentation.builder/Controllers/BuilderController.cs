@@ -24,6 +24,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
         #region Variables
 
         private readonly ChunkController _chunkController;
+        List<Task> tasks = new List<Task>();
 
         #endregion
 
@@ -133,7 +134,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 vocabulary.Fill(true, false);
                 var locationConcepts = new List<Location>();
                 var careSiteConcepts = new List<CareSite>();
-                
+
                 var providerConcepts = new List<Provider>();
 
                 Console.WriteLine("Loading locations...");
@@ -204,7 +205,7 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 connection.Open();
                 using (var c = new OdbcCommand(sql, connection))
                 {
-                   // Logger.Write(null,LogMessageTypes.Info,"FillList Query: "+sql);
+                    // Logger.Write(null,LogMessageTypes.Info,"FillList Query: "+sql);
                     c.CommandTimeout = 30000;
                     using (var reader = c.ExecuteReader())
                     {
@@ -236,9 +237,9 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
 
         public void Build(IVocabulary vocabulary)
         {
-            var saveQueue = new BlockingCollection<DatabaseChunkPart>();
+            // var saveQueue = new BlockingCollection<DatabaseChunkPart>();
 
-            PerformAction(() =>
+            PerformAction(async () =>
             {
                 if (Settings.Current.Building.ChunksCount == 0)
                 {
@@ -249,84 +250,102 @@ namespace org.ohdsi.cdm.presentation.builder.Controllers
                 vocabulary.Fill(false, false);
 
                 Logger.Write(null, LogMessageTypes.Info,
-                    $"==================== Conversion to CDM was started ====================");
+                    $"==================== Conversion to CDM was started (Chunks: {Settings.Current.Building.ChunksCount}, Parallelism: {Settings.Current.DegreeOfParallelism}) ====================");
 
-                var save = Task.Run(() =>
+                if (Settings.Current.DegreeOfParallelism < 0)
                 {
-                    while (!saveQueue.IsCompleted)
-                    {
-
-                        DatabaseChunkPart data = null;
-                        try
-                        {
-                            data = saveQueue.Take();
-                        }
-                        catch (InvalidOperationException)
-                        {
-
-                        }
-
-                        if (data != null)
-                        {
-                            var timer = new Stopwatch();
-                            timer.Start();
-                            Logger.WriteMessage(data.ChunkData.ChunkId,"Starting chunk run:");
-
-                            data.Save(Settings.Current.Building.Cdm,
-                                Settings.Current.Building.DestinationConnectionString,
-                                Settings.Current.Building.DestinationEngine,
-                                Settings.Current.Building.SourceSchema,
-                                Settings.Current.Building.CdmSchema);
-                            Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
-                            timer.Stop();
-
-                            Logger.WriteInfo(data.ChunkData.ChunkId,
-                                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
-                        }
-
-                        if (CurrentState != BuilderState.Running)
-                            break;
-                    }
-
-                    CurrentState = BuilderState.Stopped;
-                });
-
-
-                Parallel.For(0, Settings.Current.Building.ChunksCount,
+                    Parallel.Invoke(() => ChunkParralelRun(0, null));
+                }
+                else if (Settings.Current.DegreeOfParallelism > 0)
+                {
+                    Parallel.For(0, Settings.Current.Building.ChunksCount,
                     new ParallelOptions { MaxDegreeOfParallelism = Settings.Current.DegreeOfParallelism },
                     (chunkId, state) =>
-                      {
-                          if (CurrentState != BuilderState.Running)
-                              state.Break();
+                        {
+                            ChunkParralelRun(chunkId, state);
+                        });
+                }
+                else
+                {
+                    Parallel.For(0, Settings.Current.Building.ChunksCount,
+                    (chunkId, state) =>
+                        {
+                            ChunkParralelRun(chunkId, state);
+                        });
+                }
 
-                          if (!Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
-                          {
-                              var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
+                // Logger.WriteInfo($"Parallel Queues Addition Done!");
+                // saveQueue.CompleteAdding();
 
-                              using (var connection =
-                                  new OdbcConnection(Settings.Current.Building.SourceConnectionString))
-                              {
-                                  connection.Open();
-                                  saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
-                                      Settings.Current.Building.SourceSchema,
-                                      Settings.Current.Building.SourceQueryDefinitions,
-                                      connection,
-                                      Settings.Current.Building.Vendor));
-                              }
-
-                              Settings.Current.Save(false);
-
-                              while (saveQueue.Count > 0)
-                              {
-                                  Thread.Sleep(1000);
-                              }
-                          }
-                      });
-
-                saveQueue.CompleteAdding();
-
-                save.Wait();
+                Task.WaitAll(tasks.ToArray());
+                // save.Wait();
+                Logger.WriteInfo($"Save Wait Done!");
             });
+        }
+
+        private void ChunkParralelRun(int chunkId, ParallelLoopState state)
+        {
+            Logger.WriteInfo($"Initiating Parallel for ChunkId#{chunkId}");
+            if (CurrentState != BuilderState.Running && null != state)
+            {
+                Logger.WriteInfo($"Chunk#{chunkId} Break!");
+                state.Break();
+            }
+            if (Settings.Current.Building.CompletedChunkIds.Contains(chunkId))
+            {
+                Logger.WriteInfo($"Chunk#{chunkId} Already Loaded!");
+                return;
+            }
+            var chunk = new DatabaseChunkBuilder(chunkId, CreatePersonBuilder);
+
+            using (var connection =
+                new OdbcConnection(Settings.Current.Building.SourceConnectionString))
+            {
+                connection.Open();
+                Logger.WriteInfo($"Chunk#{chunkId} Processing start...");
+
+                var chPart = chunk.Process(Settings.Current.Building.SourceEngine,
+                    Settings.Current.Building.SourceSchema,
+                    Settings.Current.Building.SourceQueryDefinitions,
+                    connection,
+                    Settings.Current.Building.Vendor);
+                tasks.Add(Task.Run(() => taskRunner(chPart)));
+                /*
+                saveQueue.Add(chunk.Process(Settings.Current.Building.SourceEngine,
+                    Settings.Current.Building.SourceSchema,
+                    Settings.Current.Building.SourceQueryDefinitions,
+                    connection,
+                    Settings.Current.Building.Vendor));
+                */
+                // Logger.WriteInfo(chunkId,$"Chunk#{chunkId} Processed Queue Saved!");
+            }
+
+            Settings.Current.Save(false);
+
+            /*while (saveQueue.Count > 0)
+            {
+                Thread.Sleep(1000);
+            }*/
+        }
+
+        private void taskRunner(DatabaseChunkPart data)
+        {
+            if (null == data) return;
+
+            var timer = new Stopwatch();
+            timer.Start();
+            Logger.WriteMessage(data.ChunkData.ChunkId, "Starting chunk run:");
+
+            data.Save(Settings.Current.Building.Cdm,
+                Settings.Current.Building.DestinationConnectionString,
+                Settings.Current.Building.DestinationEngine,
+                Settings.Current.Building.SourceSchema,
+                Settings.Current.Building.CdmSchema);
+            Settings.Current.Building.CompletedChunkIds.Add(data.ChunkData.ChunkId);
+            timer.Stop();
+
+            Logger.WriteInfo(data.ChunkData.ChunkId,
+                $"ChunkId={data.ChunkData.ChunkId} was saved - {timer.ElapsedMilliseconds} ms | {GC.GetTotalMemory(false) / 1024f / 1024f} Mb");
         }
 
         private static IPersonBuilder CreatePersonBuilder()
