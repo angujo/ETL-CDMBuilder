@@ -334,6 +334,7 @@
                                              IsIndeterminate="True"
                                              Visibility="{Binding BuildingWorking, Converter={StaticResource boolToVisConverter}}" />
                                 <TextBlock Text="{Binding BuildingInfo}" TextAlignment="Center" />
+                                <TextBlock Text="{Binding BuildingRemain}" TextAlignment="Center" />
                             </StackPanel>
                             <!--<StackPanel Orientation="Vertical">
                                 <StackPanel Height="5">

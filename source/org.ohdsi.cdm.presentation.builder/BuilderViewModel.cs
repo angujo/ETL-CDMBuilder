@@ -14,31 +14,31 @@ namespace org.ohdsi.cdm.presentation.builder
         #region Variables
 
         private string _sourceServer = "localhost";
-        private string _sourceDb     = "cdm_gold_202107";
+        private string _sourceDb = "cdm_gold_202107";
         private string _sourceSchema = "source";
-        private string _sourceUser   = "cdm_user";
-        public  string SourcePswd { get; set; }
+        private string _sourceUser = "cdm_user";
+        public string SourcePswd { get; set; }
 
         private string _cdmServer = "localhost";
-        private string _cdmDb     = "cdm_gold_202107";
+        private string _cdmDb = "cdm_gold_202107";
         private string _cdmSchema = "public";
-        private string _cdmUser   = "cdm_user";
-        public  string CdmPswd { get; set; }
+        private string _cdmUser = "cdm_user";
+        public string CdmPswd { get; set; }
 
         private string _vocabServer = "localhost";
-        private string _vocabDb     = "cdm_gold_202107";
+        private string _vocabDb = "cdm_gold_202107";
         private string _vocabSchema = "public";
-        private string _vocabUser   = "cdm_user";
-        public  string VocabPswd { get; set; }
+        private string _vocabUser = "cdm_user";
+        public string VocabPswd { get; set; }
 
 
         private BuildingController _buildingController;
-        private bool               _buttonEnabled;
-        private bool               _settingUnlocked;
+        private bool _buttonEnabled;
+        private bool _settingUnlocked;
 
-        private readonly System.Timers.Timer _timer   = new System.Timers.Timer {Interval = 1000};
-        private readonly System.Timers.Timer _timerUi = new System.Timers.Timer {Interval = 1000};
-        private          int                 _errorsCount;
+        private readonly System.Timers.Timer _timer = new System.Timers.Timer { Interval = 1000 };
+        private readonly System.Timers.Timer _timerUi = new System.Timers.Timer { Interval = 1000 };
+        private int _errorsCount;
 
         #endregion
 
@@ -386,8 +386,7 @@ namespace org.ohdsi.cdm.presentation.builder
         {
             get
             {
-                if (BuildingSkipped)
-                    return "skipped";
+                if (BuildingSkipped) return "skipped";
 
                 if (BuildingComplete)
                 {
@@ -402,6 +401,19 @@ namespace org.ohdsi.cdm.presentation.builder
 
 
                 return string.Empty;
+            }
+        }
+
+        public string BuildingRemain
+        {
+            get
+            {
+                if (!BuildingStarted) return string.Empty;
+
+                var dur_secs = DateTime.Now.Subtract(Settings.Current.Building.BuildingState.BuildingStart.Value).TotalSeconds;
+                var total_secs = (_buildingController.ChunksCount * dur_secs) / _buildingController.CompleteChunksCount;
+
+                return $"{Settings.Current.Building.BuildingState.BuildingStart.Value.AddSeconds(total_secs).Subtract(DateTime.Now).ToReadableString()} to go";
             }
         }
 
@@ -927,28 +939,28 @@ namespace org.ohdsi.cdm.presentation.builder
 
         public BuilderViewModel()
         {
-            ButtonEnabled   = true;
+            ButtonEnabled = true;
             SettingUnlocked = true;
 
             Settings.Initialize();
 
             SourceServer = Settings.Current.Building.SourceServer;
-            SourceDb     = Settings.Current.Building.SourceDb;
+            SourceDb = Settings.Current.Building.SourceDb;
             SourceSchema = Settings.Current.Building.SourceSchema;
-            SourceUser   = Settings.Current.Building.SourceUser;
-            SourcePswd   = Settings.Current.Building.SourcePswd;
+            SourceUser = Settings.Current.Building.SourceUser;
+            SourcePswd = Settings.Current.Building.SourcePswd;
 
             CdmServer = Settings.Current.Building.CdmServer;
-            CdmDb     = Settings.Current.Building.CdmDb;
+            CdmDb = Settings.Current.Building.CdmDb;
             CdmSchema = Settings.Current.Building.CdmSchema;
-            CdmUser   = Settings.Current.Building.CdmUser;
-            CdmPswd   = Settings.Current.Building.CdmPswd;
+            CdmUser = Settings.Current.Building.CdmUser;
+            CdmPswd = Settings.Current.Building.CdmPswd;
 
             VocabServer = Settings.Current.Building.VocabServer;
-            VocabDb     = Settings.Current.Building.VocabDb;
+            VocabDb = Settings.Current.Building.VocabDb;
             VocabSchema = Settings.Current.Building.VocabSchema;
-            VocabUser   = Settings.Current.Building.VocabUser;
-            VocabPswd   = Settings.Current.Building.VocabPswd;
+            VocabUser = Settings.Current.Building.VocabUser;
+            VocabPswd = Settings.Current.Building.VocabPswd;
 
             _timer.Elapsed += OnTimer;
             _timer.Start();
@@ -992,6 +1004,7 @@ namespace org.ohdsi.cdm.presentation.builder
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingWorking"));
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingComplete"));
                 PropertyChanged(this, new PropertyChangedEventArgs("BuildingInfo"));
+                PropertyChanged(this, new PropertyChangedEventArgs("BuildingRemain"));
 
                 PropertyChanged(this, new PropertyChangedEventArgs("IndexesStarted"));
                 PropertyChanged(this, new PropertyChangedEventArgs("IndexesWorking"));
@@ -1076,22 +1089,22 @@ namespace org.ohdsi.cdm.presentation.builder
             //Settings.Settings.Current.Building.ChunkSize = 1000;
 
             Settings.Current.Building.SourceServer = SourceServer;
-            Settings.Current.Building.SourceDb     = SourceDb;
+            Settings.Current.Building.SourceDb = SourceDb;
             Settings.Current.Building.SourceSchema = SourceSchema;
-            Settings.Current.Building.SourceUser   = SourceUser;
-            Settings.Current.Building.SourcePswd   = SourcePswd;
+            Settings.Current.Building.SourceUser = SourceUser;
+            Settings.Current.Building.SourcePswd = SourcePswd;
 
             Settings.Current.Building.CdmServer = CdmServer;
-            Settings.Current.Building.CdmDb     = CdmDb;
+            Settings.Current.Building.CdmDb = CdmDb;
             Settings.Current.Building.CdmSchema = CdmSchema;
-            Settings.Current.Building.CdmUser   = CdmUser;
-            Settings.Current.Building.CdmPswd   = CdmPswd;
+            Settings.Current.Building.CdmUser = CdmUser;
+            Settings.Current.Building.CdmPswd = CdmPswd;
 
             Settings.Current.Building.VocabServer = VocabServer;
-            Settings.Current.Building.VocabDb     = VocabDb;
+            Settings.Current.Building.VocabDb = VocabDb;
             Settings.Current.Building.VocabSchema = VocabSchema;
-            Settings.Current.Building.VocabUser   = VocabUser;
-            Settings.Current.Building.VocabPswd   = VocabPswd;
+            Settings.Current.Building.VocabUser = VocabUser;
+            Settings.Current.Building.VocabPswd = VocabPswd;
         }
 
 

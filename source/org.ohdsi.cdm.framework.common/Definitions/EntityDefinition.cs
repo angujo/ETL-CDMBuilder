@@ -54,8 +54,8 @@ namespace org.ohdsi.cdm.framework.common.Definitions
         {
             var personId = reader.GetLong(PersonId);
 
-            if (personId.HasValue)
-            {
+            if (!personId.HasValue) yield return null;
+
                 var startDate = reader.GetDateTime(StartDate);
                 var endDate = startDate;
                 if (!string.IsNullOrEmpty(EndDate))
@@ -152,7 +152,6 @@ namespace org.ohdsi.cdm.framework.common.Definitions
                         }
                     }
                 }
-            }
         }
     }
 }

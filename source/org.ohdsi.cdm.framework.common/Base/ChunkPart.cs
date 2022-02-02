@@ -53,7 +53,6 @@ namespace org.ohdsi.cdm.framework.common.Base
             AddEntity(queryDefinition, queryDefinition.Note, reader, recordGuid, "Note");
         }
 
-
         private void AddEntity(IEntity entity)
         {
             PersonBuilders[entity.PersonId].Value.AddData(entity);
